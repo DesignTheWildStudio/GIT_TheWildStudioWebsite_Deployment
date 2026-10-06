@@ -37,6 +37,8 @@
   header[data-screen-label="Header"] > div:not(.ws-mobile-right) { display: none !important; }
   .ws-mobile-right { display: flex; align-items: center; gap: 6px; position: relative; z-index: 2; }
   .ws-mobile-logo { position: relative; z-index: 2; }
+  /* The logo image is 179px tall with -53px margins, so its box hangs ~50px below the header bar and sat on top of the first menu link (Work), sending taps to the logo instead. Only the link's own bar-height box takes taps. */
+  .ws-mobile-logo img { pointer-events: none; }
   .ws-theme-mirror { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(20,20,18,.35); background: transparent; color: inherit; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; }
   .ws-theme-mirror .ws-ico-sun { display: none; }
   html.ws-dark .ws-theme-mirror { border-color: rgba(255,255,255,.4); }
