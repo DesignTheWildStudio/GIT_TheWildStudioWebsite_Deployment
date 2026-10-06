@@ -68,7 +68,7 @@
   section[data-screen-label] { padding-left: 24px !important; padding-right: 24px !important; }
   section[data-screen-label="Marquee"], section[data-screen-label="Service categories"], section[data-screen-label="Studio story"] { padding-left: 0 !important; padding-right: 0 !important; }
   section[data-screen-label="Studio story"] > div[style*="margin: 0 40px"], section[data-screen-label="Studio story"] > div[style*="margin: 38px 40px"] { margin-left: 24px !important; margin-right: 24px !important; }
-  section[data-screen-label="Work intro"], section[data-screen-label="About hero"], section[data-screen-label="Services hero"],
+  section[data-screen-label="About hero"], section[data-screen-label="Services hero"],
   section[data-screen-label="Project intro"], section[data-screen-label="Contact"] { padding-top: 140px !important; }
 
   /* Home hero */
@@ -78,13 +78,25 @@
   section[data-screen-label="Hero"] > div[style*="height: 100vh"] { height: auto !important; min-height: 60vh !important; padding-top: 120px !important; padding-bottom: 28px !important; }
   section[data-screen-label="Hero"] [ref] > p { padding: 0 8px; }
 
-  /* Split intros (Work / About / Services) stack */
-  section[data-screen-label="Work intro"], section[data-screen-label="About hero"], section[data-screen-label="Services hero"] { flex-direction: column !important; align-items: flex-start !important; gap: 28px !important; }
-  section[data-screen-label="Work intro"] h1 span span, section[data-screen-label="About hero"] h1 span span { white-space: normal !important; }
-  section[data-screen-label="Work intro"] > div:last-child, section[data-screen-label="About hero"] > div:last-child, section[data-screen-label="Services hero"] > div:last-child {
+  /* Work banner + intro: since 5 Oct the brand animation sits on top and the intro text under it, so on phones and tablets they read like the home hero — the video box hugs the 16:9 animation, and the text is centred 24px under the sound button and fades up the same way. */
+  section[data-screen-label="Work banner"] { padding-top: 164px !important; }
+  section[data-screen-label="Work banner"] video { height: auto !important; aspect-ratio: 16 / 9; max-height: calc(100vh - 220px); }
+  section[data-screen-label="Work intro"] { padding-top: 24px !important; }
+  section[data-screen-label="Work intro"] h1 { font-size: clamp(34px, 3.6vw, 66px) !important; line-height: 1.1 !important; letter-spacing: -0.025em !important; }
+  section[data-screen-label="Work intro"] h1 span { display: inline !important; white-space: normal !important; transform: none !important; }
+  section[data-screen-label="Work intro"] h1 + div { margin-top: 8px !important; font-size: 14px !important; line-height: 1.7 !important; }
+  section[data-screen-label="Work intro"] h1 + div > span { transform: none !important; }
+  section[data-screen-label="Work intro"] h1, section[data-screen-label="Work intro"] h1 + div { animation: ws-intro-in 1.1s cubic-bezier(.19,1,.22,1) .9s both; }
+  section[data-screen-label="Work intro"] h1 + div { animation-delay: 1.18s; }
+  @keyframes ws-intro-in { from { opacity: 0; transform: translateY(34px); filter: blur(14px); } to { opacity: 1; transform: none; filter: none; } }
+
+  /* Split intros (About / Services) stack */
+  section[data-screen-label="About hero"], section[data-screen-label="Services hero"] { flex-direction: column !important; align-items: flex-start !important; gap: 28px !important; }
+  section[data-screen-label="About hero"] h1 span span { white-space: normal !important; }
+  section[data-screen-label="About hero"] > div:last-child, section[data-screen-label="Services hero"] > div:last-child {
     width: 100% !important; left: 0 !important; top: 0 !important; margin: 0 !important; align-self: center !important; display: flex; justify-content: center;
   }
-  section[data-screen-label="Work intro"] video, section[data-screen-label="About hero"] video, section[data-screen-label="Services hero"] video { width: min(100%, 420px) !important; height: auto !important; }
+  section[data-screen-label="About hero"] video, section[data-screen-label="Services hero"] video { width: min(100%, 420px) !important; height: auto !important; }
   html.ws-dark section[data-screen-label="About hero"] div[style*="isolation"], html.ws-dark section[data-screen-label="Services hero"] div[style*="isolation"] { width: 100% !important; left: 0 !important; }
   .ws-2col { grid-template-columns: 1fr !important; gap: 40px !important; }
   .ws-3col { grid-template-columns: 1fr !important; }
@@ -178,8 +190,11 @@
   section[data-screen-label] { padding-left: 18px !important; padding-right: 18px !important; }
   section[data-screen-label="Marquee"], section[data-screen-label="Service categories"], section[data-screen-label="Studio story"] { padding-left: 0 !important; padding-right: 0 !important; }
   section[data-screen-label="Studio story"] > div[style*="margin: 0 40px"], section[data-screen-label="Studio story"] > div[style*="margin: 38px 40px"] { margin-left: 18px !important; margin-right: 18px !important; }
-  section[data-screen-label="Work intro"], section[data-screen-label="About hero"], section[data-screen-label="Services hero"],
+  section[data-screen-label="About hero"], section[data-screen-label="Services hero"],
   section[data-screen-label="Project intro"], section[data-screen-label="Contact"] { padding-top: 110px !important; }
+  section[data-screen-label="Work banner"] { padding-top: 134px !important; }
+  section[data-screen-label="Work intro"] h1 { font-size: 30px !important; }
+  section[data-screen-label="Work banner"] button[aria-label*="video"] { width: 38px !important; height: 38px !important; }
 
   /* Hero */
   section[data-screen-label="Hero"] > div[style*="height: 100vh"] { padding-top: 90px !important; min-height: 0 !important; }
@@ -214,7 +229,6 @@
   section[data-screen-label="Work grid"] .ws-card > div:nth-child(2) > span:first-child { font-size: 16px !important; line-height: 1.2 !important; }
   section[data-screen-label="Work grid"] .ws-card > div:nth-child(2) > span:last-child { padding-top: 0 !important; font-size: 11px !important; }
   section[data-screen-label="Work grid"] .ws-card > div:nth-child(3) { display: none !important; }
-  section[data-screen-label="Work intro"] video { width: 220px !important; }
   div[style*="position: sticky"][style*="top: 84px"] { top: 56px !important; padding: 12px 18px !important; }
 
   /* Services categories */
