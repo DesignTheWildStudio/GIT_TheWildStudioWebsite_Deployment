@@ -16,13 +16,25 @@ plain HTML under `public/`.
   project: name, services, year, card image and the **overview blurb** shown on
   the project page and on work-grid hover cards
 - `public/*.js`, `public/responsive.css` — shared behaviour and styles
+- `public/favicon.svg` — the browser-tab icon (brush W on a black tile)
 - `src/`, `astro.config.mjs`, `package.json` — the Astro scaffold Webtold builds
+
+Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
+`public/` was checked byte-for-byte against the live build with Webtold's
+`verify_page` (sha256).
 
 ## What is NOT in this repo
 
 - `public/media/` — the image library (hundreds of `.webp` files) is managed in
   Webtold's media store
-- `public/uploads/` — video, font and other uploaded binaries
+- `public/uploads/` — video, font and other uploaded binaries. The 5 Oct pages
+  rely on `uploads/showreel-web.mp4` (home showreel, a ~4.5 MB re-encode of the
+  1080p master, which is over Webtold's 5 MB upload limit),
+  `uploads/hero-animation-web.mp4` and `uploads/untitled-design-7-d4a87f94.mp4`
+  (work banner, light/dark), `uploads/woman-typing-man-pointing-v7.mp4` and
+  `uploads/woman-typing-dark-mode-c10fc1ed.mp4` (contact illustration), plus
+  `media/showreel-poster-1080.webp`
+- `public/favicon.png` — the binary PNG version of the favicon
 - `public/fig-*/components.bundle.js` — generated Figma case-study bundles
 
 Those files are large or binary and are kept on Webtold. Use the Webtold

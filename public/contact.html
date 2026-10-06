@@ -86,6 +86,8 @@
     html.ws-dark header[style*="background: rgba(255, 255, 255"] { background: rgba(20,20,18,.8) !important; border-bottom-color: rgba(255,255,255,.1) !important; }
     html.ws-dark header img[alt^="The Wild Studio"] { filter: invert(1); }
     html.ws-dark ::selection { background: #ECEAE3; color: #141412; }
+    html.ws-dark .ws-contact-ill { background: #141412 !important; }
+    html.ws-dark .ws-contact-ill video { mix-blend-mode: screen !important; filter: none !important; clip-path: inset(0 14% 0 0); }
   </style>
 </helmet>
 
@@ -125,6 +127,7 @@
           <span ref="{{ titleRef }}" style="display: block; transform: translateY(110%); transition: transform 1.2s cubic-bezier(.19,1,.22,1) .2s;">Ready to <em style="font-family: 'Newsreader', serif; font-style: italic; font-weight: 300; color: rgba(20,20,18,.45);">get started?</em></span>
         </h1>
         <p class="ws-reveal" data-ws="reveal" style="margin: 32px 0 0; font-size: 16px; line-height: 1.75; color: rgba(20,20,18,.62); max-width: 420px;">Tell us where you are and where you want to go. We'll get back to you.</p>
+        <div class="ws-reveal ws-contact-ill" data-ws="reveal" style="margin-top: 64px; width: 269px; max-width: 100%; background: #FFFFFF; isolation: isolate;"><video src="{{ illoSrc }}" poster="/media/asset-a853532de0e95cf640d5ae26.webp" autoPlay="{{ true }}" loop="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" aria-label="Animated line illustration of two people working at a computer" style="width: 269px; max-width: 100%; height: 213px; display: block; object-fit: contain; mix-blend-mode: multiply; filter: brightness(1.08) contrast(1.06); transform: scaleX(-1);"></video></div>
       </div>
 
       <div class="ws-reveal" data-ws="reveal">
@@ -244,6 +247,16 @@ class Component extends DCLogic {
     };
     this._raf = requestAnimationFrame(tick);
 
+    const loadIllo = (key, url) => fetch(url).then((r) => r.blob()).then((b) => {
+      this.setState({ ['illoSrc_' + key]: URL.createObjectURL(b) });
+      requestAnimationFrame(() => { const v = document.querySelector('.ws-contact-ill video'); if (v && v.paused) v.play().catch(() => {}); });
+    }).catch(() => {});
+    loadIllo('light', '/uploads/woman-typing-man-pointing-v7.mp4');
+    loadIllo('dark', '/uploads/woman-typing-dark-mode-c10fc1ed.mp4');
+    this._illoThemeObs = new MutationObserver(() => { this.forceUpdate();
+      requestAnimationFrame(() => { const v = document.querySelector('.ws-contact-ill video'); if (v && v.paused) v.play().catch(() => {}); }); });
+    this._illoThemeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
     this._sweep = setInterval(() => {
       const h = window.innerHeight;
       document.querySelectorAll('[data-ws]:not(.ws-in)').forEach(el => {
@@ -257,6 +270,7 @@ class Component extends DCLogic {
     window.removeEventListener('mousemove', this._onMove);
     cancelAnimationFrame(this._raf);
     clearInterval(this._sweep);
+    if (this._illoThemeObs) this._illoThemeObs.disconnect();
   }
 
   renderVals() {
@@ -266,6 +280,13 @@ class Component extends DCLogic {
       cursorRef: mkRef('cursorRef'), cursorRingRef: mkRef('cursorRingRef'),
       curtainRef: mkRef('curtainRef'), curtainWordRef: mkRef('curtainWordRef'),
       titleRef: mkRef('titleRef'),
+      illoSrc: (() => {
+        const dark = document.documentElement.classList.contains('ws-dark');
+        const s = this.state || {};
+        return dark
+          ? (s.illoSrc_dark || '/uploads/woman-typing-dark-mode-c10fc1ed.mp4')
+          : (s.illoSrc_light || '/uploads/woman-typing-man-pointing-v7.mp4');
+      })(),
       formSent: this.state.formSent,
       formNotSent: !this.state.formSent,
       formError: this.state.formError,

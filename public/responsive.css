@@ -73,7 +73,7 @@
   section[data-screen-label="Hero"] h1 span { white-space: normal !important; }
   section[data-screen-label="Hero"] h1 br { display: none; }
   section[data-screen-label="Hero"] video.ws-hero-vid { width: 100% !important; height: auto !important; }
-  section[data-screen-label="Hero"] > div > div[style*="height: 100vh"] { height: auto !important; min-height: 60vh !important; padding-top: 120px !important; padding-bottom: 28px !important; }
+  section[data-screen-label="Hero"] > div[style*="height: 100vh"] { height: auto !important; min-height: 60vh !important; padding-top: 120px !important; padding-bottom: 28px !important; }
   section[data-screen-label="Hero"] [ref] > p { padding: 0 8px; }
 
   /* Split intros (Work / About / Services) stack */
@@ -180,9 +180,9 @@
   section[data-screen-label="Project intro"], section[data-screen-label="Contact"] { padding-top: 110px !important; }
 
   /* Hero */
-  section[data-screen-label="Hero"] > div > div[style*="height: 100vh"] { padding-top: 90px !important; min-height: 0 !important; }
+  section[data-screen-label="Hero"] > div[style*="height: 100vh"] { padding-top: 90px !important; min-height: 0 !important; }
   section[data-screen-label="Hero"] h1 { font-size: 30px !important; }
-  section[data-screen-label="Hero"] button[aria-label*="video"] { right: 14px !important; bottom: 14px !important; width: 38px !important; height: 38px !important; }
+  section[data-screen-label="Hero"] button[aria-label*="video"] { width: 38px !important; height: 38px !important; }
 
   /* Featured / Commons */
   .ws-bento-row > * { height: 190px !important; }
@@ -236,26 +236,16 @@
   footer[data-screen-label="Footer"] > a span, .ws-ticker-overlay span { font-size: 13vw !important; }
 }
 
-/* Home hero (desktop) — keep the "View work" button inside the frame.
-   The hero art box is locked to height:100vh with overflow:hidden, but it does not start at the
-   top of the page: the section's 90px padding-top minus the wrapper's -70px margin puts its top
-   edge 20px down, so a full 100vh box always ends 20px BELOW the fold. Sizing it to 100vh - 20px
-   lands its bottom edge exactly on the fold, and the bottom padding is then real, visible
-   clearance rather than space spent underneath the viewport.
-   The video is a flex item whose automatic minimum size equals its specified height
-   (calc(85vh - 185px)), so it cannot shrink; at common laptop heights the artwork + heading +
-   button together are taller than the box and overflow:hidden slices the bottom off the pill.
-   Letting the video shrink (min-height: 0) and pinning the text block makes the artwork give way
-   instead of the button. Measured across 1920x1080 down to 901x700, this holds the pill 56px clear
-   of both the clip edge and the fold; before it was 20px, which rounded away to a visible cut.
-   dvh repeats the height for browsers that have it, so a collapsing mobile toolbar in the 901px+
-   range resizes the box instead of pushing the button under the chrome. Under 901px the box is
-   already height:auto, so this is scoped to desktop. */
+/* Home hero (desktop) — the showreel and the heading block size to their content.
+   Both blocks used to be pinned to calc(100vh - 20px) so the old full-bleed brand animation
+   filled the fold. The 5 Oct showreel is a 16/9 box capped at min(1164px, 100%), so that height
+   left ~170px of empty space under the video and ~660px under the heading, pushing the featured
+   work far down the page. Letting them size to content closes both gaps.
+   The video still fits above the fold on short screens because its own max-height is
+   calc(100vh - 220px): 220px covers the 144px above it plus the sound button and its gap. */
 @media (min-width: 901px) {
   section[data-screen-label="Hero"] > div > div {
-    height: calc(100vh - 20px) !important;
-    height: calc(100dvh - 20px) !important;
-    padding-bottom: 56px;
+    padding-bottom: 24px;
   }
   section[data-screen-label="Hero"] video.ws-hero-vid { flex: 0 1 auto; min-height: 0; }
   section[data-screen-label="Hero"] > div > div > div { flex: 0 0 auto; }
