@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="./responsive.css">
   <script src="./mobile-nav.js"></script>
   <script src="./footer-reveal.js"></script>
-  <script src="./video-key.js"></script>
+  <script src="./video-key.js?v=2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&amp;family=Questrial&amp;display=swap" rel="stylesheet">
@@ -192,7 +192,7 @@
 
   <section data-screen-label="Work banner" style="position: relative; width: 100%; padding-top: 100px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; background: #FFFFFF; overflow: hidden;">
     <div style="position: relative; width: 85%; display: flex; flex-direction: column; align-items: flex-end; gap: 12px;">
-      <video ref="{{ bannerVidRef }}" data-ws-key="{{ bannerKey }}" src="{{ bannerSrc }}" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" preload="metadata" aria-label="Wild Studio brand animation" style="width: 100%; height: calc(85vh - 185px); object-fit: contain; display: block; filter: brightness(1.035); mix-blend-mode: multiply;"></video><canvas aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 0; height: 0; visibility: hidden; pointer-events: none;"></canvas>
+      <video ref="{{ bannerVidRef }}" data-ws-key="1" data-ws-key-media="(max-width: 900px), (hover: none) and (pointer: coarse)" src="{{ bannerSrc }}" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" preload="metadata" aria-label="Wild Studio brand animation" style="width: 100%; height: calc(85vh - 185px); object-fit: contain; display: block; filter: brightness(1.035); mix-blend-mode: multiply;"></video><canvas aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 0; height: 0; visibility: hidden; pointer-events: none;"></canvas>
       <button data-banner-mute="1" onClick="{{ bannerMuteToggle }}" aria-label="{{ bannerMuteLabel }}" title="{{ bannerMuteLabel }}" style="position: relative; z-index: 6; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(20,20,18,.25); background: rgba(255,255,255,.88); backdrop-filter: blur(8px); color: #141412; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
         <sc-if value="{{ bannerSoundOn }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg></sc-if>
         <sc-if value="{{ bannerMuted }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><line x1="16" y1="9" x2="22" y2="15"></line><line x1="22" y1="9" x2="16" y2="15"></line></svg></sc-if>
@@ -546,8 +546,6 @@ class Component extends DCLogic {
         this.setState({ bannerMuted: next });
       },
       bannerSrc: (typeof document !== 'undefined' && document.documentElement.classList.contains('ws-dark')) ? '/uploads/untitled-design-7-d4a87f94.mp4' : '/uploads/hero-animation-web.mp4',
-      // Phones and tablets: Safari/iOS ignore mix-blend-mode on video, so video-key.js draws the banner without its background. Larger screens keep blending (keying a desktop-size frame is too heavy).
-      bannerKey: (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(max-width: 900px)').matches) ? '1' : null,
       clientCircles, intlCircles, localCircles, orbDiscs,
       primiCls: (primiPill && primiPill.cls) || 'ws-pill',
       primiSubs,

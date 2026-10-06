@@ -4,6 +4,8 @@
 // box behind every animation. Instead, each frame of a <video data-ws-key> is drawn into the <canvas>
 // right after it with the background colour removed, and the video itself is hidden.
 // If anything goes wrong the video simply stays visible, exactly as before.
+// Optional data-ws-key-media="<media query>": only key while the query matches (checked again on resize/rotation);
+// otherwise the video is shown as it is.
 (function () {
   if (window.__wsVideoKey) return;
   window.__wsVideoKey = true;
@@ -64,6 +66,14 @@
     var c = v.nextElementSibling;
     if (!c || c.tagName !== 'CANVAS') return;
     if (c !== t.c) { t.c = c; t.ctx = c.getContext('2d'); if (!t.ctx) return giveUp(t); }
+    var mq = v.getAttribute('data-ws-key-media');
+    if (mq && window.matchMedia && !window.matchMedia(mq).matches) {
+      if (t.shown) { t.shown = false; t.drawn = ''; v.style.opacity = ''; c.style.visibility = 'hidden'; }
+      return;
+    }
+    var src = v.currentSrc || v.src;
+    // A new source is loading (e.g. the other theme's animation): don't leave the old one's last frame showing.
+    if (t.drawn && t.drawn !== src) { t.ctx.clearRect(0, 0, c.width, c.height); t.drawn = ''; }
     // Skip videos that are hidden (e.g. the other theme's version) or have no frame yet.
     if (!v.offsetParent || v.readyState < 2 || !v.videoWidth || !v.videoHeight) return;
     var bw = v.offsetWidth, bh = v.offsetHeight;
@@ -79,11 +89,11 @@
     if (work.width !== dw || work.height !== dh) { work.width = dw; work.height = dh; }
     wctx.drawImage(v, 0, 0, dw, dh);
     var img = wctx.getImageData(0, 0, dw, dh);
-    var src = v.currentSrc || v.src;
     if (!t.bg || t.bgSrc !== src) { t.bg = edgeColour(img.data, dw, dh); t.bgSrc = src; }
     key(img, t.bg);
     t.ctx.clearRect(0, 0, cw, ch);
     t.ctx.putImageData(img, Math.round((cw - dw) / 2), Math.round((ch - dh) / 2));
+    t.drawn = src;
     if (!t.shown) { t.shown = true; s.visibility = 'visible'; v.style.opacity = '0'; }
   }
 
@@ -106,7 +116,7 @@
     var t = { v: v, c: null, ctx: null, last: -1 };
     v.__wsKey = t;
     tracked.push(t);
-    ['loadeddata', 'seeked', 'pause', 'ended'].forEach(function (e) { v.addEventListener(e, function () { safeDraw(t); }); });
+    ['loadeddata', 'seeked', 'pause', 'ended', 'emptied'].forEach(function (e) { v.addEventListener(e, function () { safeDraw(t); }); });
     v.addEventListener('play', kick);
     v.addEventListener('playing', kick);
     safeDraw(t);
