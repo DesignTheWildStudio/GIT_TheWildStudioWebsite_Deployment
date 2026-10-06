@@ -170,7 +170,6 @@
     html.ws-dark .ws-track > div .ws-testi-logo.ws-keepcolor, html.ws-dark .ws-track > div[style*="background: rgb(20, 20, 18)"] .ws-testi-logo.ws-keepcolor { filter: none !important; }
     html.ws-dark .ws-track > div .ws-testi-logo.ws-whiteon { filter: grayscale(1) brightness(0) invert(1) !important; }
     html.ws-dark .ws-track > div[style*="background: rgb(20, 20, 18)"] .ws-testi-logo.ws-whiteon { filter: none !important; }
-    html.ws-dark .ws-hero-vid { mix-blend-mode: screen !important; filter: none !important; }
     html.ws-dark section[data-screen-label="Hero"] button[aria-label*="video"] { background: #141412 !important; border-color: #FFFFFF !important; color: #FFFFFF !important; }
     html.ws-dark .ws-lamp-light { display: none !important; }
     html.ws-dark .ws-lamp-dark { display: block !important; }
@@ -213,9 +212,13 @@
   <!-- ===================== HERO ===================== -->
   <section id="top" data-screen-label="Hero" style="position: relative; min-height: 40vh; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 90px 40px 78px; background: #FFFFFF; text-align: center">
     <div ref="{{ heroArtRef }}" style="position: relative; width: 100vw; margin-left: calc(50% - 50vw); height: auto; margin-top: -70px;">
-      <div style="position: relative; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; overflow: hidden; background: #FFFFFF; padding-top: 100px; box-sizing: border-box;">
-        <video class="ws-hero-vid" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" preload="auto" src="uploads/main-animation-for-website-tws-b8eb11fb.mp4" style="width: 85%; height: calc(85vh - 185px); object-fit: contain; display: block; filter: brightness(1.035); mix-blend-mode: multiply;"></video>
-        <div ref="{{ heroTextRef }}" style="position: relative; margin: 5px auto 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 1400px; opacity: 1; transform: none; will-change: opacity, transform">
+      
+    </div><div style="position: relative; width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; overflow: hidden; background: #FFFFFF; padding-top: 100px; box-sizing: border-box;">
+        
+        <div style="width: min(1164px, 100%); display: flex; flex-direction: column; align-items: flex-end; gap: 12px;"><video class="ws-hero-vid" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" loop="{{ true }}" preload="auto" poster="/media/showreel-poster-1080.webp" src="/uploads/showreel-web.mp4" style="width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: calc(100vh - 220px); object-fit: cover; display: block; border-radius: 18px; background: #141412"></video><button onClick="{{ heroMuteToggle }}" aria-label="{{ heroMuteLabel }}" title="{{ heroMuteLabel }}" style="position: relative; z-index: 6; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(20,20,18,.25); background: rgba(255,255,255,.88); backdrop-filter: blur(8px); color: #141412; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
+          <sc-if value="{{ heroUnmuted }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg></sc-if>
+          <sc-if value="{{ heroMuted }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><line x1="16" y1="9" x2="22" y2="15"></line><line x1="22" y1="9" x2="16" y2="15"></line></svg></sc-if>
+        </button></div><div ref="{{ heroTextRef }}" style="position: relative; margin: 24px auto 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 1400px; opacity: 1; transform: none; will-change: opacity, transform">
       <h1 style="margin: 0; font-weight: 400; font-size: clamp(34px, 3.6vw, 66px); line-height: 1.1; letter-spacing: -0.025em; text-align: center">
         <span style="display: block; white-space: nowrap; transition: opacity 1.1s cubic-bezier(.19,1,.22,1) 0.1s, transform 1.1s cubic-bezier(.19,1,.22,1) 0.1s, filter 1.1s cubic-bezier(.19,1,.22,1) 0.1s; opacity: {{ heroOpacity }}; transform: translateY({{ heroY }}); filter: blur({{ heroBlur }});">We turn big, messy ideas into<br>brands with a lot of <span class="ws-mark"><span><em style="font-family: 'Newsreader', serif; font-style: italic; font-weight: 300;">heart</em></span></span>.</span>
       </h1>
@@ -224,12 +227,7 @@
         <a class="ws-btn" href="work.html" style="width: auto; height: 49px; padding: 0 28px; font-size: 14px;">View work</a>
       </div>
         </div>
-        <button onClick="{{ heroMuteToggle }}" aria-label="{{ heroMuteLabel }}" title="{{ heroMuteLabel }}" style="position: absolute; right: 28px; bottom: 28px; z-index: 6; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(20,20,18,.25); background: rgba(255,255,255,.88); backdrop-filter: blur(8px); color: #141412; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
-          <sc-if value="{{ heroUnmuted }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg></sc-if>
-          <sc-if value="{{ heroMuted }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><line x1="16" y1="9" x2="22" y2="15"></line><line x1="22" y1="9" x2="16" y2="15"></line></svg></sc-if>
-        </button>
       </div>
-    </div>
   </section>
 
   <!-- ===================== FEATURED BENTO ===================== -->
@@ -500,7 +498,8 @@
 <div style="font-size: 16px; line-height: 1; font-family: 'Century Gothic', CenturyGothic, Questrial, 'Helvetica Neue', sans-serif; position: absolute; left: 81px; top: 10px; display: none">Your text here</div></x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;marqueeSpeed&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 22, &quot;min&quot;: 8, &quot;max&quot;: 60, &quot;step&quot;: 1, &quot;unit&quot;: &quot;s&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Experience&quot;}}">
 class Component extends DCLogic {
-  state = { open: -1, quote: 0, formSent: false, formError: '', pickedServices: [], activeProject: null };
+  state = { open: -1, quote: 0, formSent: false, formError: '', pickedServices: [], activeProject: null, heroMuted: true };
+  _userMuted = false;
 
   services = [
     { name: 'Branding', items: ['Brand identity and guidelines', 'Moodboard concepts', 'Logo Design', 'Product Design', 'Packaging Design'] },
@@ -759,23 +758,6 @@ class Component extends DCLogic {
     this._heroScrubRaf = requestAnimationFrame(heroScrubTick);
 
 
-    const HERO_LIGHT = 'uploads/main-animation-for-website-tws-b8eb11fb.mp4';
-    const HERO_DARK = 'uploads/untitled-design-7-d4a87f94.mp4';
-    this._heroThemeSwap = () => {
-      const hv = document.querySelector('video.ws-hero-vid');
-      if (!hv) return;
-      const want = document.documentElement.classList.contains('ws-dark') ? HERO_DARK : HERO_LIGHT;
-      if (hv.getAttribute('src') === want) return;
-      const t = hv.currentTime || 0, wasMuted = hv.muted, done = !!hv.dataset.wsEndedOnce;
-      hv.setAttribute('src', want); hv.load();
-      hv.addEventListener('loadeddata', () => {
-        if (done) { try { hv.currentTime = Math.max(0, hv.duration - 0.05); } catch (e) {} hv.pause(); return; }
-        try { hv.currentTime = t; } catch (e) {} hv.muted = wasMuted; hv.play().catch(() => {});
-      }, { once: true });
-    };
-    this._heroThemeSwap();
-    this._heroThemeObs = new MutationObserver(this._heroThemeSwap);
-    this._heroThemeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     this._vidSweep = setInterval(() => {
       const heroes = document.querySelectorAll('video.ws-hero-vid');
       document.querySelectorAll('video, audio').forEach(v => {
@@ -797,9 +779,21 @@ class Component extends DCLogic {
           else this._heroStall = 0;
         } else this._heroStall = 0;
         this._heroLastT = hv.currentTime;
-        if (this._heroSoundOk && hv.muted && !this._userMuted) { hv.muted = false; hv.volume = 1; }
+        if (this._heroSoundOk && hv.muted && !this._userMuted && this._heroInView !== false) { hv.muted = false; hv.volume = 1; }
       }
     }, 400);
+    // Sound only plays while the hero showreel is on screen.
+    this._heroInView = true;
+    this._heroIO = new IntersectionObserver(([en]) => {
+      const hv = document.querySelector('video.ws-hero-vid'); if (!hv) return;
+      this._heroInView = en.isIntersecting;
+      if (!en.isIntersecting) hv.muted = true;
+      else if (!this._userMuted && this._heroSoundOk) { hv.muted = false; hv.volume = 1; }
+    }, { threshold: 0.35 });
+    requestAnimationFrame(() => { const hv = document.querySelector('video.ws-hero-vid'); if (!hv) return; this._heroIO.observe(hv);
+      // Button mirrors what the visitor actually hears.
+      const sync = () => { if (this.state.heroMuted !== hv.muted) this.setState({ heroMuted: hv.muted }); };
+      hv.addEventListener('volumechange', sync); sync(); });
     // Every load / reload / bfcache restore starts the hero video from the top.
     this._heroRestart = () => {
       const hv = document.querySelector('video.ws-hero-vid');
@@ -807,7 +801,7 @@ class Component extends DCLogic {
       delete hv.dataset.wsEndedOnce; delete hv.dataset.wsStarted;
       try { hv.currentTime = 0; } catch (e) {}
       // Try with sound first; if the browser blocks or stalls it, fall back to muted so the video still plays.
-      hv.muted = !!this._userMuted; hv.volume = 1;
+      hv.muted = this._heroSoundOk ? !!this._userMuted : true; hv.volume = 1;
       const t0 = hv.currentTime;
       hv.play().catch(() => { hv.muted = true; hv.play().catch(() => {}); });
       setTimeout(() => {
@@ -827,16 +821,24 @@ class Component extends DCLogic {
       hv.muted = false; hv.volume = 1;
       const t0 = hv.currentTime;
       hv.play().catch(() => { hv.muted = true; hv.play().catch(() => {}); });
-      setTimeout(() => { if (!hv.muted && hv.currentTime > t0 + 0.05) this._heroSoundOk = true; else if (!hv.muted && !this._heroSoundOk) { hv.muted = true; hv.play().catch(() => {}); } }, 700);
+      setTimeout(() => { if (!hv.muted && hv.currentTime > t0 + 0.05) { this._heroSoundOk = true; this._heroSoundStarted = true; } else if (!hv.muted && !this._heroSoundOk) { hv.muted = true; hv.play().catch(() => {}); } }, 700);
     };
     setTimeout(this._heroTrySound, 300); setTimeout(this._heroTrySound, 1500);
     // Browsers block unmuted autoplay until the user interacts; unmute on the first gesture.
-    this._heroSoundUnlock = () => {
+    this._heroSoundUnlock = (e) => {
+      // Scroll/wheel don't count as a gesture for audio; wait for a real click, tap or key press.
+      const ua = navigator.userActivation;
+      if (ua && !ua.isActive && !ua.hasBeenActive) return;
+      if (e && e.target && e.target.closest && e.target.closest('[aria-label="Mute video"], [aria-label="Unmute video"]')) return;
+      ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.removeEventListener(ev, this._heroSoundUnlock, true));
+      this._heroSoundOk = true;
       const hv = document.querySelector('video.ws-hero-vid');
-      if (hv && !this._userMuted && !hv.dataset.wsEndedOnce) { this._heroSoundOk = true; hv.muted = false; hv.volume = 1; if (hv.paused && !hv.ended) hv.play().catch(() => {}); }
-      ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'].forEach(ev => window.removeEventListener(ev, this._heroSoundUnlock));
+      if (!hv || this._userMuted) return;
+      // Start the reel over so picture and music begin together.
+      if (!this._heroSoundStarted) { this._heroSoundStarted = true; try { hv.currentTime = 0; } catch (err) {} }
+      if (this._heroInView !== false) { hv.muted = false; hv.volume = 1; hv.play().catch(() => { hv.muted = true; hv.play().catch(() => {}); }); }
     };
-    ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'].forEach(ev => window.addEventListener(ev, this._heroSoundUnlock, { passive: true }));
+    ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.addEventListener(ev, this._heroSoundUnlock, { passive: true, capture: true }));
     this._logoFill = setInterval(() => {
       const imgs = document.querySelectorAll('img[data-logo-src]:not([src])');
       if (!imgs.length) { clearInterval(this._logoFill); return; }
@@ -1001,6 +1003,7 @@ class Component extends DCLogic {
     window.removeEventListener('scroll', this._onScroll);
     cancelAnimationFrame(this._raf);
     clearInterval(this._revealTimer);
+    if (this._heroIO) this._heroIO.disconnect();
     if (this._io) this._io.disconnect();
     if (this._cio) this._cio.disconnect();
   }
@@ -1031,10 +1034,10 @@ class Component extends DCLogic {
       heroMuteLabel: this.state && this.state.heroMuted ? 'Unmute video' : 'Mute video',
       heroMuteToggle: (e) => {
         if (e && e.preventDefault) e.preventDefault();
-        const next = !(this.state && this.state.heroMuted);
-        this._userMuted = next;
         const hv = document.querySelector('video.ws-hero-vid');
-        if (hv) { hv.muted = next; if (!next) { hv.volume = 1; if (hv.paused && !hv.ended && !hv.dataset.wsEndedOnce) hv.play().catch(() => {}); } }
+        const next = hv ? !hv.muted : !(this.state && this.state.heroMuted);
+        this._userMuted = next;
+        if (hv) { hv.muted = next; if (!next) { this._heroSoundOk = true; if (!this._heroSoundStarted) { this._heroSoundStarted = true; try { hv.currentTime = 0; } catch (err) {} } hv.volume = 1; if (hv.paused && !hv.ended) hv.play().catch(() => {}); } }
         this.setState({ heroMuted: next });
       },
 
