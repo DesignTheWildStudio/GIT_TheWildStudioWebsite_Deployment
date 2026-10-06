@@ -80,6 +80,10 @@
     .ws-mq-pale:hover { filter: none !important; }
     html.ws-dark .ws-mq-pale { filter: grayscale(1) brightness(0) invert(1) !important; }
     html.ws-dark .ws-mq-pale:hover { filter: none !important; }
+    .ws-mq-ink { filter: grayscale(1) brightness(0) invert(.227) !important; }
+    .ws-mq-ink:hover { filter: none !important; }
+    html.ws-dark .ws-mq-ink { filter: grayscale(1) brightness(0) invert(.773) !important; }
+    html.ws-dark .ws-mq-ink:hover { filter: none !important; }
     @keyframes ws-scrolldot-x { 0% { transform: translateX(-100%); } 100% { transform: translateX(220%); } }
     @keyframes ws-scrollarrow-x { 0%, 100% { transform: translateX(0); opacity: .55; } 50% { transform: translateX(5px); opacity: 1; } }
     .ws-scrollcue-x { position: absolute; left: 40px; bottom: 12px; display: flex; align-items: center; gap: 10px; pointer-events: none; color: #141412; transition: opacity .5s ease; }
@@ -1057,8 +1061,9 @@ class Component extends DCLogic {
           { name: 'Natasha', logo: 'media/natasha-logo-27cc87e8.webp', h: 42 },
           { name: 'Ayesha Diwan', logo: 'media/ayesha-diwan-logo-ee0f053c.webp', h: 83, whover: true },
           { name: 'Emaan Dharani', logo: 'media/emaan-dharani-logo-2e9066ba.webp', dark: 'media/emaan-dharani-logo-dark-8f74dd53.webp', h: 118, hDark: 148 },
+          { name: 'Emoto', logo: 'media/emoto-logo-262a79e8.webp', ink: true },
         ];
-        return [...list, ...list].map(m => ({ ...m, h: m.h || 64, mx: m.mx || 56, hDark: m.hDark || m.h || 64, lightCls: (m.dark ? 'ws-swap ' : '') + (m.pale ? 'ws-mq-pale ' : '') + (m.whover ? 'ws-mq-whover ' : '') + (m.white ? 'ws-mq-white' : '') }));
+        return [...list, ...list].map(m => ({ ...m, h: m.h || 64, mx: m.mx || 56, hDark: m.hDark || m.h || 64, lightCls: (m.dark ? 'ws-swap ' : '') + (m.pale ? 'ws-mq-pale ' : '') + (m.ink ? 'ws-mq-ink ' : '') + (m.whover ? 'ws-mq-whover ' : '') + (m.white ? 'ws-mq-white' : '') }));
       })(),
       marqueeItemsB: (() => {
         const list = [
@@ -1075,8 +1080,9 @@ class Component extends DCLogic {
           { name: 'FNB Guru', logo: 'media/fnb-guru-logo-43b4ae04.webp', dark: 'media/fnb-guru-logo-43b4ae04.webp', h: 88 },
           { name: 'Chyll', logo: 'media/chyll-logo-1eb3e28f.webp', dark: 'media/arsha-and-emaan-logo-c5ecca73.webp', h: 60 },
           { name: 'The Commons Karachi', logo: 'media/sitwat-rizvi-logo-ec55da08.webp', h: 88, white: true },
+          { name: 'Super Power', logo: 'media/super-power-logo-ed89da47.webp', pale: true },
         ];
-        return [...list, ...list].map(m => ({ ...m, h: m.h || 64, mx: m.mx || 56, hDark: m.hDark || m.h || 64, lightCls: (m.dark ? 'ws-swap ' : '') + (m.pale ? 'ws-mq-pale ' : '') + (m.whover ? 'ws-mq-whover ' : '') + (m.white ? 'ws-mq-white' : '') }));
+        return [...list, ...list].map(m => ({ ...m, h: m.h || 64, mx: m.mx || 56, hDark: m.hDark || m.h || 64, lightCls: (m.dark ? 'ws-swap ' : '') + (m.pale ? 'ws-mq-pale ' : '') + (m.ink ? 'ws-mq-ink ' : '') + (m.whover ? 'ws-mq-whover ' : '') + (m.white ? 'ws-mq-white' : '') }));
       })(),
       marqueeItems2: (() => {
         const list = [
