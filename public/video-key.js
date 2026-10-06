@@ -4,13 +4,19 @@
 // box behind every animation. Instead, each frame of a <video data-ws-key> is drawn into the <canvas>
 // right after it with the background colour removed, and the video itself is hidden.
 // If anything goes wrong the video simply stays visible, exactly as before.
-// Optional data-ws-key-media="<media query>": only key while the query matches (checked again on resize/rotation);
-// otherwise the video is shown as it is.
+// Optional per video:
+//   data-ws-key-media="<media query>"  key only while the query matches (re-checked on resize/rotation);
+//                                      otherwise the plain video is shown.
+//   data-ws-key="banner"               for a large animation whose source changes with the theme: keys at most
+//                                      BANNER_PX pixels per frame, at most ~30 times a second, and clears the
+//                                      canvas when the source changes so the other theme's frame never lingers.
 (function () {
   if (window.__wsVideoKey) return;
   window.__wsVideoKey = true;
 
   var GATE = 0.06; // pixels this close to the background colour (0–1) become fully transparent
+  var BANNER_PX = 1000000;
+  var BANNER_GAP = 30; // ms between banner frames
   var tracked = [];
   var work = document.createElement('canvas');
   var wctx = work.getContext('2d', { willReadFrequently: true });
@@ -67,13 +73,21 @@
     if (!c || c.tagName !== 'CANVAS') return;
     if (c !== t.c) { t.c = c; t.ctx = c.getContext('2d'); if (!t.ctx) return giveUp(t); }
     var mq = v.getAttribute('data-ws-key-media');
-    if (mq && window.matchMedia && !window.matchMedia(mq).matches) {
-      if (t.shown) { t.shown = false; t.drawn = ''; v.style.opacity = ''; c.style.visibility = 'hidden'; }
-      return;
+    if (mq && window.matchMedia) {
+      if (t.mqText !== mq) {
+        t.mqText = mq; t.mql = window.matchMedia(mq);
+        var recheck = function () { safeDraw(t); };
+        if (t.mql.addEventListener) t.mql.addEventListener('change', recheck); else if (t.mql.addListener) t.mql.addListener(recheck);
+      }
+      if (!t.mql.matches) {
+        if (t.shown) { t.shown = false; t.drawn = ''; v.style.opacity = ''; c.style.visibility = 'hidden'; }
+        return;
+      }
     }
-    var src = v.currentSrc || v.src;
-    // A new source is loading (e.g. the other theme's animation): don't leave the old one's last frame showing.
-    if (t.drawn && t.drawn !== src) { t.ctx.clearRect(0, 0, c.width, c.height); t.drawn = ''; }
+    if (t.banner) {
+      var now = v.getAttribute('src') || v.currentSrc;
+      if (t.drawn && t.drawn !== now) { t.ctx.clearRect(0, 0, c.width, c.height); t.drawn = ''; }
+    }
     // Skip videos that are hidden (e.g. the other theme's version) or have no frame yet.
     if (!v.offsetParent || v.readyState < 2 || !v.videoWidth || !v.videoHeight) return;
     var bw = v.offsetWidth, bh = v.offsetHeight;
@@ -81,6 +95,7 @@
     var s = c.style;
     s.left = v.offsetLeft + 'px'; s.top = v.offsetTop + 'px'; s.width = bw + 'px'; s.height = bh + 'px';
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (t.banner && bw * bh * dpr * dpr > BANNER_PX) dpr = Math.sqrt(BANNER_PX / (bw * bh));
     var cw = Math.round(bw * dpr), ch = Math.round(bh * dpr);
     if (c.width !== cw || c.height !== ch) { c.width = cw; c.height = ch; }
     // Same framing as the video element (object-fit: contain).
@@ -89,11 +104,12 @@
     if (work.width !== dw || work.height !== dh) { work.width = dw; work.height = dh; }
     wctx.drawImage(v, 0, 0, dw, dh);
     var img = wctx.getImageData(0, 0, dw, dh);
+    var src = v.currentSrc || v.src;
     if (!t.bg || t.bgSrc !== src) { t.bg = edgeColour(img.data, dw, dh); t.bgSrc = src; }
     key(img, t.bg);
     t.ctx.clearRect(0, 0, cw, ch);
     t.ctx.putImageData(img, Math.round((cw - dw) / 2), Math.round((ch - dh) / 2));
-    t.drawn = src;
+    if (t.banner) t.drawn = v.getAttribute('src') || v.currentSrc;
     if (!t.shown) { t.shown = true; s.visibility = 'visible'; v.style.opacity = '0'; }
   }
 
@@ -105,7 +121,11 @@
       var t = tracked[i];
       if (t.failed || t.v.paused || t.v.ended) continue;
       busy = true;
-      if (t.v.currentTime !== t.last) { t.last = t.v.currentTime; safeDraw(t); }
+      if (t.v.currentTime !== t.last) {
+        var at = Date.now();
+        if (t.banner && at - (t.at || 0) < BANNER_GAP) continue;
+        t.at = at; t.last = t.v.currentTime; safeDraw(t);
+      }
     }
     if (busy && !document.hidden) requestAnimationFrame(tick); else looping = false;
   }
@@ -113,10 +133,10 @@
   function redrawAll() { for (var i = 0; i < tracked.length; i++) safeDraw(tracked[i]); kick(); }
 
   function register(v) {
-    var t = { v: v, c: null, ctx: null, last: -1 };
+    var t = { v: v, c: null, ctx: null, last: -1, banner: v.getAttribute('data-ws-key') === 'banner' };
     v.__wsKey = t;
     tracked.push(t);
-    ['loadeddata', 'seeked', 'pause', 'ended', 'emptied'].forEach(function (e) { v.addEventListener(e, function () { safeDraw(t); }); });
+    ['loadeddata', 'seeked', 'pause', 'ended'].concat(t.banner ? ['emptied'] : []).forEach(function (e) { v.addEventListener(e, function () { safeDraw(t); }); });
     v.addEventListener('play', kick);
     v.addEventListener('playing', kick);
     safeDraw(t);
