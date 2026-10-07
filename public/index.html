@@ -619,6 +619,8 @@ class Component extends DCLogic {
 
   heroVidPortrait(v) {
     if (!v) return;
+    // Safari's autoplay rules look for these attributes; React only sets the muted property.
+    if (!v.__wsAttrs) { v.__wsAttrs = true; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); }
     if (!this.heroPortrait()) { this.heroVidAv1(v); return; }
     if (v.__wsPortrait) return;
     v.__wsPortrait = true;
@@ -831,10 +833,13 @@ class Component extends DCLogic {
       const hv = heroes[0];
       if (hv && !hv.dataset.wsEndedOnce) {
         if (!hv._wsEndBound) { hv._wsEndBound = true; hv.addEventListener('ended', () => { hv.dataset.wsEndedOnce = '1'; hv.pause(); }); }
-        if (hv.paused && !hv.ended && hv.readyState >= 2 && (hv.currentTime === 0 || hv.dataset.wsStarted)) {
+        // Keep the showreel playing whenever it is paused. Safari may refuse the first autoplay and then stop loading at
+        // the first frame, or pause the video part-way (tab switch, power saving), so don't wait for buffered data or 0:00.
+        if (hv.paused && !hv.ended && !hv._wsPlayPending) {
           hv.dataset.wsStarted = '1';
           hv.muted = this._heroSoundOk ? !!this._userMuted : true; hv.volume = 1;
-          hv.play().catch(() => { hv.muted = true; hv.play().catch(() => {}); });
+          hv._wsPlayPending = true;
+          hv.play().catch(() => { hv.muted = true; return hv.play(); }).catch(() => {}).then(() => { hv._wsPlayPending = false; });
         }
         // Stall guard: unmuted but not advancing for two ticks → fall back to muted playback.
         if (!hv.paused && !hv.muted) {
