@@ -41,7 +41,9 @@ showreel), after `149fe5e8` (new home showreels).
   cut instead: `uploads/showreel-web-v2.mp4` (desktop/tablet, H.264 High +
   AAC, 1280x720, 30 fps, ~4.7 MB) with `media/showreel-poster-v2.webp`, and
   `uploads/showreel-mobile-v2.webm` (phones, VP9 + Opus, 608x1080, 30 fps,
-  ~4.5 MB) with `media/showreel-mobile-poster-v2.webp`
+  ~4.5 MB) with `media/showreel-mobile-poster-v2.webp`. Desktop/tablet browsers that can play AV1
+  get `uploads/showreel-web-av1.mp4` (AV1 + AAC, 1920x1080, ~4.5 MB) instead of
+  the H.264 file
 - `public/favicon.png` — the binary PNG version of the favicon
 - `public/fig-*/components.bundle.js` — generated Figma case-study bundles
 

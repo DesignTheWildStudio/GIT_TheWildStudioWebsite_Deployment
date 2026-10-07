@@ -592,8 +592,35 @@ class Component extends DCLogic {
     return this._heroPortrait;
   }
 
+  // Everywhere else, browsers that can play AV1 get the sharper 1080p AV1 cut; the rest keep the H.264 MP4 in the markup.
+  heroAv1() {
+    if (this._heroAv1 === undefined) {
+      let ok = false;
+      try { ok = !this.heroPortrait() && document.createElement('video').canPlayType('video/mp4; codecs="av01.0.08M.08, mp4a.40.2"') !== ''; } catch (e) {}
+      this._heroAv1 = ok;
+    }
+    return this._heroAv1;
+  }
+
+  heroVidAv1(v) {
+    if (v.__wsAv1 || !this.heroAv1()) return;
+    v.__wsAv1 = true;
+    v.setAttribute('src', '/uploads/showreel-web-av1.mp4');
+    // Back to the H.264 MP4 if this browser can't actually load or show the AV1 file (error, no picture, or nothing after 8s).
+    const fallback = () => {
+      if (!this._heroAv1) return;
+      this._heroAv1 = false;
+      v.setAttribute('src', '/uploads/showreel-web-v2.mp4');
+    };
+    v.addEventListener('error', fallback, { once: true });
+    v.addEventListener('loadedmetadata', () => { if (!v.videoWidth) fallback(); }, { once: true });
+    setTimeout(() => { if (v.isConnected && (v.readyState < 1 || !v.videoWidth)) fallback(); }, 8000);
+  }
+
   heroVidPortrait(v) {
-    if (!v || v.__wsPortrait || !this.heroPortrait()) return;
+    if (!v) return;
+    if (!this.heroPortrait()) { this.heroVidAv1(v); return; }
+    if (v.__wsPortrait) return;
     v.__wsPortrait = true;
     // The wrapper narrows to the video's 9:16 width when the height is capped, and the box has no dark background,
     // so no black bars or slivers show at the sides.
