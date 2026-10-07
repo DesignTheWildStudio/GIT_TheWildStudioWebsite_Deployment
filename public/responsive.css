@@ -80,6 +80,7 @@
 
   /* Work banner + intro: since 5 Oct the brand animation sits on top and the intro text under it, so on phones and tablets they read like the home hero — the video box hugs the 16:9 animation, and the text is centred 24px under the sound button and fades up the same way. */
   section[data-screen-label="Work banner"] { padding-top: 164px !important; }
+  section[data-screen-label="Work banner"] > div { width: 85% !important; }
   section[data-screen-label="Work banner"] video { height: auto !important; aspect-ratio: 16 / 9; max-height: calc(100vh - 220px); }
   section[data-screen-label="Work intro"] { padding-top: 24px !important; }
   section[data-screen-label="Work intro"] h1 { font-size: clamp(34px, 3.6vw, 66px) !important; line-height: 1.1 !important; letter-spacing: -0.025em !important; }
