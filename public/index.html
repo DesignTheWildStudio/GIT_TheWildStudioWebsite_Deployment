@@ -84,7 +84,8 @@
     .ws-mq-ink:hover { filter: none !important; }
     html.ws-dark .ws-mq-ink { filter: grayscale(1) brightness(0) invert(.773) !important; }
     html.ws-dark .ws-mq-ink:hover { filter: none !important; }
-    .ws-hero-vid.ws-hero-portrait { aspect-ratio: 9 / 16 !important; object-fit: contain !important; }
+    .ws-hero-vid.ws-hero-portrait { aspect-ratio: 9 / 16 !important; object-fit: cover !important; }
+    .ws-hero-portrait-wrap { max-width: calc((100vh - 220px) * 9 / 16); }
     @keyframes ws-scrolldot-x { 0% { transform: translateX(-100%); } 100% { transform: translateX(220%); } }
     @keyframes ws-scrollarrow-x { 0%, 100% { transform: translateX(0); opacity: .55; } 50% { transform: translateX(5px); opacity: 1; } }
     .ws-scrollcue-x { position: absolute; left: 40px; bottom: 12px; display: flex; align-items: center; gap: 10px; pointer-events: none; color: #141412; transition: opacity .5s ease; }
@@ -594,12 +595,14 @@ class Component extends DCLogic {
   heroVidPortrait(v) {
     if (!v || v.__wsPortrait || !this.heroPortrait()) return;
     v.__wsPortrait = true;
-    v.classList.add('ws-hero-portrait'); v.removeAttribute('poster'); v.setAttribute('src', '/uploads/showreel-mobile.webm');
+    // The wrapper narrows to the video's 9:16 width when the height is capped, so no black bars show at the sides.
+    v.classList.add('ws-hero-portrait'); if (v.parentElement) v.parentElement.classList.add('ws-hero-portrait-wrap');
+    v.removeAttribute('poster'); v.setAttribute('src', '/uploads/showreel-mobile-v2.webm');
     // Back to the landscape MP4 if this phone can't actually load or show the WebM (error, no picture, or still nothing after 8s).
     const fallback = () => {
       if (!this._heroPortrait) return;
       this._heroPortrait = false;
-      v.classList.remove('ws-hero-portrait'); v.setAttribute('poster', '/media/showreel-poster-1080.webp'); v.setAttribute('src', '/uploads/showreel-web.mp4');
+      v.classList.remove('ws-hero-portrait'); if (v.parentElement) v.parentElement.classList.remove('ws-hero-portrait-wrap'); v.setAttribute('poster', '/media/showreel-poster-1080.webp'); v.setAttribute('src', '/uploads/showreel-web.mp4');
     };
     v.addEventListener('error', fallback, { once: true });
     v.addEventListener('loadedmetadata', () => { if (!v.videoWidth) fallback(); }, { once: true });
