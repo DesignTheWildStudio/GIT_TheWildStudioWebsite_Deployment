@@ -425,7 +425,9 @@ class Component extends DCLogic {
     this._introThemeObs = new MutationObserver(() => { this.forceUpdate();
       requestAnimationFrame(() => { document.querySelectorAll('section[data-screen-label="Work banner"] video').forEach(v => { if (v.paused && !v.ended) v.play().catch(() => {}); }); }); });
     this._introThemeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    // Banner animation: plays once, muted on load; the button turns sound on.
+    // Banner animation: plays once, muted on load. Like the home showreel, sound comes on at the visitor's first click, tap
+    // or key press anywhere on the page (scrolling doesn't count), starting the animation over so picture and sound begin
+    // together; the button mutes/unmutes at any time and a mute sticks. Sound only plays while the banner is on screen.
     this._bannerWantSound = false;
     this._bannerSync = () => { const v = this.refs.bannerVid; if (v && v.muted !== this.state.bannerMuted) this.setState({ bannerMuted: v.muted }); };
     requestAnimationFrame(() => {
@@ -433,7 +435,37 @@ class Component extends DCLogic {
       v.addEventListener('volumechange', this._bannerSync);
       v.muted = true;
       v.play().catch(() => {}); this._bannerSync();
+      this._bannerIO = new IntersectionObserver(([en]) => {
+        this._bannerInView = en.isIntersecting;
+        const bv = this.refs.bannerVid; if (!bv) return;
+        if (!en.isIntersecting) { bv.muted = true; this._bannerSync(); }
+        else if (this._bannerSoundOk && !this._bannerUserMuted) this._bannerStartSound();
+      }, { threshold: 0.35 });
+      this._bannerIO.observe(v);
     });
+    this._bannerInView = true;
+    // Unmutes the banner; the first time sound starts, the animation starts over from the beginning.
+    this._bannerStartSound = () => {
+      const v = this.refs.bannerVid; if (!v) return;
+      const first = !this._bannerSoundStarted;
+      if (first) { this._bannerSoundStarted = true; try { v.currentTime = 0; } catch (err) {} }
+      v.muted = false; v.volume = 1;
+      // Back to muted only if the browser refuses sound; a play() cut short by a new source (theme switch) is not a refusal.
+      if (first || (v.paused && !v.ended)) v.play().catch((err) => { if (err && err.name === 'NotAllowedError') { v.muted = true; this._bannerSync(); v.play().catch(() => {}); } });
+      // Update the button now: a source change (theme switch) drops the pending volumechange event.
+      this._bannerSync();
+    };
+    this._bannerSoundUnlock = (e) => {
+      // Scroll/wheel don't count as a gesture for audio; wait for a real click, tap or key press.
+      const ua = navigator.userActivation;
+      if (ua && !ua.isActive && !ua.hasBeenActive) return;
+      if (e && e.target && e.target.closest && e.target.closest('[data-banner-mute]')) return;
+      ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.removeEventListener(ev, this._bannerSoundUnlock, true));
+      this._bannerSoundOk = true;
+      if (this._bannerUserMuted || this._bannerInView === false) return;
+      this._bannerStartSound();
+    };
+    ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.addEventListener(ev, this._bannerSoundUnlock, { passive: true, capture: true }));
 
     requestAnimationFrame(() => {
       const w = this.refs.curtainWordRef; if (w) w.style.opacity = '1';
@@ -490,6 +522,8 @@ class Component extends DCLogic {
 
   componentWillUnmount() {
     window.removeEventListener('mousemove', this._onMove);
+    if (this._bannerIO) this._bannerIO.disconnect();
+    if (this._bannerSoundUnlock) ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.removeEventListener(ev, this._bannerSoundUnlock, true));
     cancelAnimationFrame(this._raf);
     clearInterval(this._sweep);
     if (this._io) this._io.disconnect();
@@ -541,8 +575,9 @@ class Component extends DCLogic {
         const v = this.refs.bannerVid; if (!v) return;
         const next = !v.muted;
         this._bannerWantSound = !next;
+        this._bannerUserMuted = next;
         v.muted = next;
-        if (!next) { v.volume = 1; if (v.ended) { try { v.currentTime = 0; } catch (err) {} } v.play().catch(() => {}); }
+        if (!next) { this._bannerSoundOk = true; if (!this._bannerSoundStarted) { this._bannerSoundStarted = true; try { v.currentTime = 0; } catch (err) {} } v.volume = 1; if (v.ended) { try { v.currentTime = 0; } catch (err) {} } v.play().catch(() => {}); }
         this.setState({ bannerMuted: next });
       },
       bannerSrc: (typeof document !== 'undefined' && document.documentElement.classList.contains('ws-dark')) ? '/uploads/untitled-design-7-d4a87f94.mp4' : '/uploads/hero-animation-web.mp4',
