@@ -430,17 +430,21 @@ class Component extends DCLogic {
     // together; the button mutes/unmutes at any time and a mute sticks. Sound only plays while the banner is on screen.
     this._bannerWantSound = false;
     this._bannerSync = () => { const v = this.refs.bannerVid; if (v && v.muted !== this.state.bannerMuted) this.setState({ bannerMuted: v.muted }); };
+    this._bannerArm = (on) => ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => on ? window.addEventListener(ev, this._bannerSoundUnlock, { passive: true, capture: true }) : window.removeEventListener(ev, this._bannerSoundUnlock, true));
     requestAnimationFrame(() => {
       const v = this.refs.bannerVid; if (!v) return;
       v.addEventListener('volumechange', this._bannerSync);
       v.muted = true;
       v.play().catch(() => {}); this._bannerSync();
+      // "On screen" = at least 35% visible. The extra 0 threshold reports when the banner leaves the screen completely,
+      // so sound turned on with the button while it was mostly scrolled away still stops once it's gone.
       this._bannerIO = new IntersectionObserver(([en]) => {
-        this._bannerInView = en.isIntersecting;
+        const inView = en.isIntersecting && en.intersectionRatio >= 0.34;
+        this._bannerInView = inView;
         const bv = this.refs.bannerVid; if (!bv) return;
-        if (!en.isIntersecting) { bv.muted = true; this._bannerSync(); }
+        if (!inView) { bv.muted = true; this._bannerSync(); }
         else if (this._bannerSoundOk && !this._bannerUserMuted) this._bannerStartSound();
-      }, { threshold: 0.35 });
+      }, { threshold: [0, 0.35] });
       this._bannerIO.observe(v);
     });
     this._bannerInView = true;
@@ -450,8 +454,14 @@ class Component extends DCLogic {
       const first = !this._bannerSoundStarted;
       if (first) { this._bannerSoundStarted = true; try { v.currentTime = 0; } catch (err) {} }
       v.muted = false; v.volume = 1;
-      // Back to muted only if the browser refuses sound; a play() cut short by a new source (theme switch) is not a refusal.
-      if (first || (v.paused && !v.ended)) v.play().catch((err) => { if (err && err.name === 'NotAllowedError') { v.muted = true; this._bannerSync(); v.play().catch(() => {}); } });
+      // Back to muted only if the browser refuses sound (a play() cut short by a new source on a theme switch is not a
+      // refusal); then the next real tap tries again.
+      if (first || (v.paused && !v.ended)) v.play().catch((err) => {
+        if (!err || err.name !== 'NotAllowedError') return;
+        v.muted = true; this._bannerSync(); v.play().catch(() => {});
+        if (first) this._bannerSoundStarted = false;
+        this._bannerSoundOk = false; this._bannerArm(true);
+      });
       // Update the button now: a source change (theme switch) drops the pending volumechange event.
       this._bannerSync();
     };
@@ -459,13 +469,21 @@ class Component extends DCLogic {
       // Scroll/wheel don't count as a gesture for audio; wait for a real click, tap or key press.
       const ua = navigator.userActivation;
       if (ua && !ua.isActive && !ua.hasBeenActive) return;
-      if (e && e.target && e.target.closest && e.target.closest('[data-banner-mute]')) return;
-      ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.removeEventListener(ev, this._bannerSoundUnlock, true));
+      // Without the UserActivation API (older Safari) a touch that starts a scroll looks like a tap: only clicks and keys count.
+      if (!ua && e && e.type !== 'click' && e.type !== 'keydown') return;
+      const t = e && e.target && e.target.closest ? e.target : null;
+      // Keys that only move around the page (Tab, arrows, Page Up/Down, Space to scroll...) don't count either.
+      if (e && e.type === 'keydown' && (e.ctrlKey || e.metaKey || e.altKey || /^(Tab|Arrow|Page|Home$|End$|Shift|Control|Alt|Meta|Escape)/.test(e.key) ||
+        (e.key === ' ' && !(t && t.closest('button, a, input, textarea, select, [role="button"]'))))) return;
+      if (t && t.closest('[data-banner-mute]')) return;
+      // The phone menu covers the banner: wait for a tap after it is closed.
+      if (document.documentElement.classList.contains('ws-nav-open') || (t && t.closest('.ws-burger, .ws-drawer'))) return;
+      this._bannerArm(false);
       this._bannerSoundOk = true;
       if (this._bannerUserMuted || this._bannerInView === false) return;
       this._bannerStartSound();
     };
-    ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.addEventListener(ev, this._bannerSoundUnlock, { passive: true, capture: true }));
+    this._bannerArm(true);
 
     requestAnimationFrame(() => {
       const w = this.refs.curtainWordRef; if (w) w.style.opacity = '1';
@@ -523,7 +541,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     window.removeEventListener('mousemove', this._onMove);
     if (this._bannerIO) this._bannerIO.disconnect();
-    if (this._bannerSoundUnlock) ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(ev => window.removeEventListener(ev, this._bannerSoundUnlock, true));
+    if (this._bannerArm) this._bannerArm(false);
     cancelAnimationFrame(this._raf);
     clearInterval(this._sweep);
     if (this._io) this._io.disconnect();
