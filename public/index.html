@@ -84,7 +84,7 @@
     .ws-mq-ink:hover { filter: none !important; }
     html.ws-dark .ws-mq-ink { filter: grayscale(1) brightness(0) invert(.773) !important; }
     html.ws-dark .ws-mq-ink:hover { filter: none !important; }
-    .ws-hero-vid.ws-hero-portrait { aspect-ratio: 9 / 16 !important; object-fit: cover !important; }
+    .ws-hero-vid.ws-hero-portrait { aspect-ratio: 9 / 16 !important; object-fit: cover !important; background: transparent !important; }
     .ws-hero-portrait-wrap { max-width: calc((100vh - 220px) * 9 / 16); }
     @keyframes ws-scrolldot-x { 0% { transform: translateX(-100%); } 100% { transform: translateX(220%); } }
     @keyframes ws-scrollarrow-x { 0%, 100% { transform: translateX(0); opacity: .55; } 50% { transform: translateX(5px); opacity: 1; } }
@@ -221,7 +221,7 @@
       
     </div><div style="position: relative; width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; overflow: hidden; background: #FFFFFF; padding-top: 100px; box-sizing: border-box;">
         
-        <div style="width: min(1164px, 100%); display: flex; flex-direction: column; align-items: flex-end; gap: 12px;"><video ref="{{ heroVidRef }}" class="ws-hero-vid" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" loop="{{ true }}" preload="auto" poster="/media/showreel-poster-1080.webp" src="/uploads/showreel-web.mp4" style="width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: calc(100vh - 220px); object-fit: cover; display: block; border-radius: 18px; background: #141412"></video><button onClick="{{ heroMuteToggle }}" aria-label="{{ heroMuteLabel }}" title="{{ heroMuteLabel }}" style="position: relative; z-index: 6; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(20,20,18,.25); background: rgba(255,255,255,.88); backdrop-filter: blur(8px); color: #141412; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
+        <div style="width: min(1164px, 100%); display: flex; flex-direction: column; align-items: flex-end; gap: 12px;"><video ref="{{ heroVidRef }}" class="ws-hero-vid" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" loop="{{ true }}" preload="auto" poster="/media/showreel-poster-v2.webp" src="/uploads/showreel-web-v2.mp4" style="width: 100%; aspect-ratio: 16 / 9; height: auto; max-height: calc(100vh - 220px); object-fit: cover; display: block; border-radius: 18px; background: #141412"></video><button onClick="{{ heroMuteToggle }}" aria-label="{{ heroMuteLabel }}" title="{{ heroMuteLabel }}" style="position: relative; z-index: 6; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(20,20,18,.25); background: rgba(255,255,255,.88); backdrop-filter: blur(8px); color: #141412; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
           <sc-if value="{{ heroUnmuted }}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg></sc-if>
           <sc-if value="{{ heroMuted }}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none"></polygon><line x1="16" y1="9" x2="22" y2="15"></line><line x1="22" y1="9" x2="16" y2="15"></line></svg></sc-if>
         </button></div><div ref="{{ heroTextRef }}" style="position: relative; margin: 24px auto 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 1400px; opacity: 1; transform: none; will-change: opacity, transform">
@@ -595,14 +595,15 @@ class Component extends DCLogic {
   heroVidPortrait(v) {
     if (!v || v.__wsPortrait || !this.heroPortrait()) return;
     v.__wsPortrait = true;
-    // The wrapper narrows to the video's 9:16 width when the height is capped, so no black bars show at the sides.
+    // The wrapper narrows to the video's 9:16 width when the height is capped, and the box has no dark background,
+    // so no black bars or slivers show at the sides.
     v.classList.add('ws-hero-portrait'); if (v.parentElement) v.parentElement.classList.add('ws-hero-portrait-wrap');
-    v.removeAttribute('poster'); v.setAttribute('src', '/uploads/showreel-mobile-v2.webm');
+    v.setAttribute('poster', '/media/showreel-mobile-poster-v2.webp'); v.setAttribute('src', '/uploads/showreel-mobile-v2.webm');
     // Back to the landscape MP4 if this phone can't actually load or show the WebM (error, no picture, or still nothing after 8s).
     const fallback = () => {
       if (!this._heroPortrait) return;
       this._heroPortrait = false;
-      v.classList.remove('ws-hero-portrait'); if (v.parentElement) v.parentElement.classList.remove('ws-hero-portrait-wrap'); v.setAttribute('poster', '/media/showreel-poster-1080.webp'); v.setAttribute('src', '/uploads/showreel-web.mp4');
+      v.classList.remove('ws-hero-portrait'); if (v.parentElement) v.parentElement.classList.remove('ws-hero-portrait-wrap'); v.setAttribute('poster', '/media/showreel-poster-v2.webp'); v.setAttribute('src', '/uploads/showreel-web-v2.mp4');
     };
     v.addEventListener('error', fallback, { once: true });
     v.addEventListener('loadedmetadata', () => { if (!v.videoWidth) fallback(); }, { once: true });

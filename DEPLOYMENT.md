@@ -35,7 +35,11 @@ Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
   `uploads/woman-typing-dark-mode-c10fc1ed.mp4` (contact illustration), plus
   `media/showreel-poster-1080.webp`; and, from 7 Oct, `uploads/showreel-mobile.webm`
   (vertical 720x1280 home showreel for phones up to 640px wide; VP9 + Opus,
-  60 fps, ~4.5 MB)
+  60 fps, ~4.5 MB). Since the second 7 Oct update the home hero uses the new
+  cut instead: `uploads/showreel-web-v2.mp4` (desktop/tablet, H.264 High +
+  AAC, 1280x720, 30 fps, ~4.7 MB) with `media/showreel-poster-v2.webp`, and
+  `uploads/showreel-mobile-v2.webm` (phones, VP9 + Opus, 608x1080, 30 fps,
+  ~4.5 MB) with `media/showreel-mobile-poster-v2.webp`
 - `public/favicon.png` — the binary PNG version of the favicon
 - `public/fig-*/components.bundle.js` — generated Figma case-study bundles
 
