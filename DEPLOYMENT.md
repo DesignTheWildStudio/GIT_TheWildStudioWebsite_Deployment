@@ -21,7 +21,8 @@ plain HTML under `public/`.
 
 Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
 `public/` was checked byte-for-byte against the live build with Webtold's
-`verify_page` (sha256).
+`verify_page` (sha256). Since then each change has been verified the same way;
+the latest is deploy `149fe5e8` (7 Oct 2026, new home showreels).
 
 ## What is NOT in this repo
 
