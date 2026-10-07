@@ -33,7 +33,9 @@ Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
   `uploads/hero-animation-web.mp4` and `uploads/untitled-design-7-d4a87f94.mp4`
   (work banner, light/dark), `uploads/woman-typing-man-pointing-v7.mp4` and
   `uploads/woman-typing-dark-mode-c10fc1ed.mp4` (contact illustration), plus
-  `media/showreel-poster-1080.webp`
+  `media/showreel-poster-1080.webp`; and, from 7 Oct, `uploads/showreel-mobile.webm`
+  (vertical 720x1280 home showreel for phones up to 640px wide; VP9 + Opus,
+  60 fps, ~4.5 MB)
 - `public/favicon.png` — the binary PNG version of the favicon
 - `public/fig-*/components.bundle.js` — generated Figma case-study bundles
 
