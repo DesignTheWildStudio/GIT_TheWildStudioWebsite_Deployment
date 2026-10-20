@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&amp;family=Questrial&amp;display=swap" rel="stylesheet">
-  <script src="./projects-data.js?v=45"></script>
+  <script src="./projects-data.js?v=46"></script>
   <style>
     @font-face { font-family: 'Century Gothic'; src: url('uploads/century-gothic/centurygothic.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
     @font-face { font-family: 'Century Gothic'; src: url('uploads/century-gothic/centurygothic-bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
@@ -378,7 +378,7 @@ class Component extends DCLogic {
   state = { view: 'grid', showAll: false, bannerMuted: true };
 
   get data() {
-    const keep = ['commons-karachi', 'aisha-diwan', 'rabia', 'goodhood', 'alaye', 'methodfive', 'butterhaus', 'jigri-foods', 'swad-meem', 'project-em', 'alize', 'oshoot', 'emaan-dharani', 'rosa-blanca', 'okatshe', 'fnb-guru', 'joie', 'soglo-skincare', 'saha', 'summer-digital', 'primi-digital', 'shamain', 'sarahs-pantry', 'swaleha-hassam-paracha', 'from-home-with-love', 'ink-and-ivy', 'the-gift-boutique', 'gac-hospitality', 'the-hudson-rose', 'pops-corner'];
+    const keep = ['commons-karachi', 'aisha-diwan', 'rabia', 'goodhood', 'alaye', 'methodfive', 'butterhaus', 'jigri-foods', 'swad-meem', 'project-em', 'alize', 'oshoot', 'emaan-dharani', 'rosa-blanca', 'okatshe', 'fnb-guru', 'joie', 'soglo-skincare', 'saha', 'summer-digital', 'primi-digital', 'shamain', 'sarahs-pantry', 'swaleha-hassam-paracha', 'from-home-with-love', 'ink-and-ivy', 'the-gift-boutique', 'gac-hospitality', 'the-hudson-rose', 'pops-corner', 'natasha'];
     const all = (typeof window !== 'undefined' && window.WS_PROJECTS) || [];
     const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
     const rank = (p) => {

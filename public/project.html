@@ -20,8 +20,8 @@
   <script src="./footer-reveal.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Questrial&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-  <script src="./projects-data.js?v=45"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Questrial&family=Montserrat:wght@400;700&family=Manrope:wght@400;500&display=swap" rel="stylesheet">
+  <script src="./projects-data.js?v=46"></script>
   <style>
     @font-face { font-family: 'Century Gothic'; src: url('uploads/century-gothic/centurygothic.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
     @font-face { font-family: 'Century Gothic'; src: url('uploads/century-gothic/centurygothic-bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
@@ -316,7 +316,23 @@
     <sc-if value="{{ isGoodhood }}" hint-placeholder-val="{{ false }}">
       <div ref="{{ figWrapRef }}" style="overflow: hidden; margin: 0 -40px;">
         <div ref="{{ figScaleRef }}" style="width: 1440px;">
-          <x-import component-from-global-scope="Goodhood" from="/fig-goodhood/components.bundle.js" hint-size="1440px,7283px"></x-import>
+          <x-import component-from-global-scope="Goodhood" from="/fig-goodhood/components.bundle.js" hint-size="1440px,9142px"></x-import>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isJashn }}" hint-placeholder-val="{{ false }}">
+      <div ref="{{ figWrapRef }}" style="overflow: hidden; margin: -60px -40px 0;">
+        <div ref="{{ figScaleRef }}" style="width: 1440px;">
+          <div style="margin-top: -130px;">
+            <x-import component-from-global-scope="JashnCommons" from="/fig-jashn/components.bundle.js" hint-size="1440px,5877px"></x-import>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isNatasha }}" hint-placeholder-val="{{ false }}">
+      <div ref="{{ figWrapRef }}" style="overflow: hidden; margin: 0 -40px;">
+        <div ref="{{ figScaleRef }}" style="width: 1440px;">
+          <x-import component-from-global-scope="Natasha" from="/fig-natasha/components.bundle.js" hint-size="1440px,6767px"></x-import>
         </div>
       </div>
     </sc-if>
@@ -617,6 +633,18 @@ class Component extends DCLogic {
       });
     };
     this._posterRaf = requestAnimationFrame(scrubPosters);
+    // Case-study images (Goodhood, Jashn, Natasha) load lazily: their CSS only shows an image once .ws-vis is on the
+    // element, added here as each one comes within 1500px of the viewport.
+    this._lzSweep = () => {
+      document.querySelectorAll('[class*="fig-asset-"]:not([data-lz])').forEach(el => {
+        el.setAttribute('data-lz', '');
+        if (this._lz) this._lz.observe(el); else el.classList.add('ws-vis');
+      });
+    };
+    if ('IntersectionObserver' in window) this._lz = new IntersectionObserver((es) => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('ws-vis'); this._lz.unobserve(en.target); } }), { rootMargin: '1500px 0px' });
+    this._lzMo = new MutationObserver(() => this._lzSweep());
+    this._lzMo.observe(document.body, { childList: true, subtree: true });
+    this._lzSweep();
     this._figSync = setInterval(() => {
       document.querySelectorAll('video').forEach(v => {
         v.muted = true; v.volume = 0;
@@ -642,6 +670,8 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
+    if (this._lz) this._lz.disconnect();
+    if (this._lzMo) this._lzMo.disconnect();
     window.removeEventListener('mousemove', this._onMove);
     cancelAnimationFrame(this._raf);
     clearInterval(this._sweep);
@@ -716,6 +746,8 @@ class Component extends DCLogic {
       isRosa: !!(p.fig && p.fig.comp === 'RosaBlanca'),
       isOshootFig: !!(p.fig && p.fig.comp === 'OSHOOT'),
       isGoodhood: !!(p.fig && p.fig.comp === 'Goodhood'),
+      isJashn: !!(p.fig && p.fig.comp === 'JashnCommons'),
+      isNatasha: !!(p.fig && p.fig.comp === 'Natasha'),
       isAlaye: !!(p.fig && p.fig.comp === 'Alaye'),
       isAlize: !!(p.fig && p.fig.comp === 'Alize'),
       isButterhaus: !!(p.fig && p.fig.comp === 'Butterhaus'),
@@ -749,7 +781,7 @@ class Component extends DCLogic {
         { left: 95.086, top: 3466.887, w: 209, h: 54, href: 'project.html?id=dil-se' },
         { left: 851.086, top: 4239.875, w: 209, h: 54, href: 'project.html?id=colour-crush' },
         { left: 92.461, top: 4957.304, w: 209, h: 54, href: 'project.html?id=chaandni-raatein' },
-        { left: 877.086, top: 5828.675, w: 209, h: 54, href: '#', label: 'Coming soon' },
+        { left: 877.086, top: 5828.675, w: 209, h: 54, href: 'project.html?id=jashn' },
       ].map(b => ({ ...b, label: b.label || 'View full project' })),
       name: p.name, services: p.services, year: p.year, blurb: p.blurb,
       hasStory: !!(p.timeline && p.timeline.length),

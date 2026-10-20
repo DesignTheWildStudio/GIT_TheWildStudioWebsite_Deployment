@@ -45,6 +45,12 @@ showreel), after `149fe5e8` (new home showreels).
   get `uploads/showreel-web-av1.mp4` (AV1 + AAC, 1920x1080, ~4.5 MB) instead of
   the H.264 file
 - `public/favicon.png` — the binary PNG version of the favicon
+- `public/fig-goodhood/`, `public/fig-jashn/`, `public/fig-natasha/` — case-study
+  bundles from the 20 Oct 2026 handoff (`components.bundle.js`, built from the
+  handoff's `Components.bundle.js` + `fig-assets.css` with the image rules
+  inlined and pointed at `media/goodhood-*`, `media/jashn-*`, `media/natasha-*`;
+  PNGs converted to lossless WebP). Their images only show once
+  `project.html` adds `.ws-vis` to each element near the viewport.
 - `public/fig-*/components.bundle.js` — generated Figma case-study bundles
 
 Those files are large or binary and are kept on Webtold. Use the Webtold
