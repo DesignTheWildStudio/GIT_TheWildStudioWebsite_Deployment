@@ -22,8 +22,10 @@ plain HTML under `public/`.
 Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
 `public/` was checked byte-for-byte against the live build with Webtold's
 `verify_page` (sha256). Since then each change has been verified the same way;
-the latest is deploy `c2f931e6` (7 Oct 2026, Work banner sound like the home
-showreel), after `149fe5e8` (new home showreels).
+the latest is deploy `331ae793` (20 Oct 2026, Natasha and Jashn case studies,
+updated Goodhood), after `f7d51939` (home showreel in AV1, Safari autoplay),
+`c2f931e6` (Work banner sound like the home showreel) and `149fe5e8` (new home
+showreels).
 
 ## What is NOT in this repo
 
