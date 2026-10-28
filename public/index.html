@@ -15,7 +15,7 @@
 <x-dc>
 <helmet>
   <script src="./theme.js"></script>
-  <link rel="stylesheet" href="./responsive.css">
+  <link rel="stylesheet" href="./responsive.css?v=2">
   <script src="./mobile-nav.js"></script>
   <script src="./footer-reveal.js?v=2"></script>
   <script src="./projects-data.js"></script>
@@ -651,7 +651,7 @@ class Component extends DCLogic {
       return;
     }
     const top = pin.getBoundingClientRect().top + window.scrollY;
-    const span = pin.offsetHeight - window.innerHeight;
+    const span = this.tSpan(pin);
     const p = Math.max(0, Math.min(1, (window.scrollY - top) / span));
     const step = 1 / (n - 1);
     const next = Math.max(0, Math.min(1, (Math.round(p / step) + dir) * step));
@@ -663,9 +663,15 @@ class Component extends DCLogic {
       const k = Math.min(1, (now - t0) / 520);
       const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
       window.scrollTo({ top: from + (to - from) * e, behavior: 'instant' });
-      if (k < 1) this._tTween = requestAnimationFrame(tick);
+      this._tTween = k < 1 ? requestAnimationFrame(tick) : 0;
     };
     this._tTween = requestAnimationFrame(tick);
+  }
+
+  // Scroll distance over which the panel stays pinned: the pin minus its 100vh sticky panel.
+  tSpan(pin) {
+    const sticky = pin.firstElementChild;
+    return Math.max(1, pin.offsetHeight - (sticky ? sticky.offsetHeight : window.innerHeight));
   }
 
   testiTick() {
@@ -677,10 +683,17 @@ class Component extends DCLogic {
     const pad = window.innerWidth <= 640 ? 36 : window.innerWidth <= 900 ? 48 : 40;
     const travel = Math.max(0, track.scrollWidth - (window.innerWidth - pad));
     // Desktop pin: the panel holds for a short scrub only — the rail covers 2.4px per 1px of page
-    // scroll, so the footer stays a few wheel notches away in both directions.
-    const need = 'calc(100vh + ' + Math.round(travel / 2.4) + 'px)';
+    // scroll, and never more than two screens of it (short landscape screens), so the footer stays
+    // a few wheel notches or swipes away in both directions.
+    const vhPx = (pin.firstElementChild && pin.firstElementChild.offsetHeight) || window.innerHeight;
+    const need = 'calc(100vh + ' + Math.round(Math.min(travel / 2.4, 2 * vhPx)) + 'px)';
     if (mobile) { if (pin.style.height) pin.style.height = ''; }
-    else if (this._tPinH !== need || !pin.style.height) { pin.style.height = need; this._tPinH = need; }
+    else if (this._tPinH !== need || !pin.style.height) {
+      // A resize that changes the pin while it sits above the viewport must not shift what is on screen.
+      const r0 = this._tPinH && pin.style.height ? pin.getBoundingClientRect() : null;
+      pin.style.height = need; this._tPinH = need;
+      if (r0 && r0.bottom <= 0) window.scrollBy({ top: pin.offsetHeight - r0.height, behavior: 'instant' });
+    }
     let p;
     if (mobile) {
       p = (this.state.tIdx || 0) / Math.max(1, this.quotes.length - 1);
@@ -688,8 +701,7 @@ class Component extends DCLogic {
     } else {
       track.style.transition = '';
       const top = pin.getBoundingClientRect().top + window.scrollY;
-      const span = Math.max(1, pin.offsetHeight - window.innerHeight);
-      p = Math.max(0, Math.min(1, (window.scrollY - top) / span));
+      p = Math.max(0, Math.min(1, (window.scrollY - top) / this.tSpan(pin)));
     }
     track.querySelectorAll('img.ws-testi-logo').forEach(el => {
       const u = el.getAttribute('data-logo-src');
@@ -700,7 +712,8 @@ class Component extends DCLogic {
     let fs = 15;
     track.style.setProperty('--ws-tfs', fs + 'px');
     while (fs > 10 && over() > 0) { fs -= 0.5; track.style.setProperty('--ws-tfs', fs + 'px'); }
-    if (mobile || this._tDirect) {
+    // Finger drags and the arrow buttons' own tween drive the rail directly; easing on top would lag.
+    if (mobile || this._tDirect || this._tTween) {
       cancelAnimationFrame(this._tRaf); this._tRaf = 0; this._tX = -p * travel;
       track.style.transform = 'translate3d(' + this._tX.toFixed(1) + 'px,0,0)';
     } else this.tGlide(track, -p * travel);
@@ -739,7 +752,8 @@ class Component extends DCLogic {
         const realA = footerEl && footerEl.querySelector('a');
         if (!ov || !curtain || !realA) return;
         const cTop = curtain.getBoundingClientRect().top;
-        const realTop = realA.getBoundingClientRect().top;
+        // Layout position: footer-reveal.js may still be sliding this row in.
+        const realTop = footerEl.getBoundingClientRect().top + realA.offsetTop;
         const track = document.querySelector('.ws-track');
         const testiSec = track && (track.closest('section') || track);
         const tBottom = testiSec ? testiSec.getBoundingClientRect().bottom : -1;
@@ -792,6 +806,7 @@ class Component extends DCLogic {
         if (Math.abs(dx) > 40) this.tScroll(dx < 0 ? 1 : -1);
       };
       rail.addEventListener('touchend', this._tTouchEnd, { passive: true });
+      rail.addEventListener('touchcancel', () => { this._tDirect = false; }, { passive: true });
       this._tTouchMove = (e) => {
         const t = e.touches[0], dx = t.clientX - x0, dy = t.clientY - y0;
         if (horiz === null) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; horiz = Math.abs(dx) > Math.abs(dy) * 1.2; }
@@ -799,7 +814,7 @@ class Component extends DCLogic {
         e.preventDefault();
         if (this.tMobile()) return; // mobile: step on touchend, no scroll-driven scrub
         const pin = document.querySelector('.ws-tpin');
-        const span = Math.max(1, pin.offsetHeight - window.innerHeight);
+        const span = this.tSpan(pin);
         const track = pin.querySelector('.ws-track');
         const pad = window.innerWidth <= 640 ? 36 : window.innerWidth <= 900 ? 48 : 40;
         const travel = Math.max(1, track.scrollWidth - (window.innerWidth - pad));

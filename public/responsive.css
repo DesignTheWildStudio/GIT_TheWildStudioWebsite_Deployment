@@ -28,7 +28,14 @@
 }
 
 @media (max-width: 900px) {
-  html, body { overflow-x: hidden; }
+  /* The page itself must scroll, not <body>. With support.js's html,body{height:100%}, overflow-x:hidden on body
+     made it a scroll box of its own: window scroll events never fired (the footer stayed blank) and swipes that
+     started on the fixed header, or right after hitting the bottom, went nowhere. clip trims sideways overflow
+     without creating a scroll box; browsers without clip keep hidden. With clip, body also grows to its content so
+     Safari's clip (which can cut composited layers on both axes) never trims the page below the first screen. */
+  html { overflow-x: hidden; }
+  body { overflow-x: hidden; overflow-x: clip; }
+  @supports (overflow-x: clip) { html > body { height: auto; min-height: 100%; } }
   img, video { max-width: 100%; }
 
   /* Header: logo + hamburger */
@@ -61,6 +68,8 @@
   html.ws-dark .ws-drawer a.ws-drawer-sub + a:not(.ws-drawer-sub) { border-top-color: rgba(255,255,255,.12); }
   html.ws-dark .ws-drawer a.ws-drawer-cta { border-color: #FFFFFF; }
   html.ws-nav-open, html.ws-nav-open body { overflow: hidden; }
+  /* Where the page scrolls (clip support), lock only the page: a hidden <body> would turn back into a scroll box. */
+  @supports (overflow-x: clip) { html.ws-nav-open body { overflow: visible; overflow-x: clip; } }
   html.ws-nav-open header[data-screen-label="Header"] { background: transparent !important; border-bottom-color: transparent !important; backdrop-filter: none !important; }
   .ws-dd-menu { left: auto !important; right: 0 !important; }
 
@@ -167,8 +176,9 @@
   section[data-screen-label="Contact"] div[style*="grid-template-columns: minmax(0,1fr) minmax(0,1fr)"] { grid-template-columns: 1fr !important; }
 
   /* Footer: fixed panel must not become its own scroll container (it traps touch scroll);
-     the curtain grows so the whole footer is reachable by page scroll. */
-  footer[data-screen-label="Footer"] { overflow: visible !important; height: auto !important; min-height: min(100vh, 800px) !important; padding-bottom: 32px !important; }
+     the curtain grows so the whole footer is reachable by page scroll. clip (not a scroll container) keeps the
+     rows' slide-in inside the footer, so it never adds a white strip or extra scroll below the page. */
+  footer[data-screen-label="Footer"] { overflow: visible !important; overflow: clip !important; height: auto !important; min-height: min(100vh, 800px) !important; padding-bottom: 32px !important; }
   .ws-footer-curtain { height: auto !important; min-height: min(100vh, 800px) !important; }
   .ws-footer-curtain footer { position: relative !important; }
   .ws-ticker-overlay { display: none !important; }

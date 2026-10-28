@@ -15,7 +15,7 @@
 <x-dc>
 <helmet>
   <script src="./theme.js"></script>
-  <link rel="stylesheet" href="./responsive.css">
+  <link rel="stylesheet" href="./responsive.css?v=2">
   <script src="./mobile-nav.js"></script>
   <script src="./footer-reveal.js?v=2"></script>
   <script src="./video-key.js?v=2"></script>
@@ -405,7 +405,8 @@ class Component extends DCLogic {
         const realA = footerEl && footerEl.querySelector('a');
         if (!ov || !curtain || !realA) return;
         const cTop = curtain.getBoundingClientRect().top;
-        const realTop = realA.getBoundingClientRect().top;
+        // Layout position: footer-reveal.js may still be sliding this row in.
+        const realTop = footerEl.getBoundingClientRect().top + realA.offsetTop;
         realA.style.visibility = '';
         const lastSec = document.querySelector('section[data-screen-label="Work CTA"]');
         const clear = !lastSec || lastSec.getBoundingClientRect().bottom <= realTop;

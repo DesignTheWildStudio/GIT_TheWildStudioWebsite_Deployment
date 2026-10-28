@@ -2,6 +2,8 @@
 // Each footer row fades and slides in as it is uncovered — by the rising curtain on desktop, where the
 // footer is fixed behind it, or by the viewport edge on phones, where the footer scrolls normally.
 (function () {
+  // The page runtime mounts head scripts a second time; one set of listeners is enough.
+  if (window.__wsFooterReveal) return; window.__wsFooterReveal = true;
   var ease = function (x) { return 1 - Math.pow(1 - x, 3); };
   function update() {
     var wrap = document.querySelector('.ws-footer-curtain');
@@ -14,7 +16,8 @@
     });
     var r = wrap.getBoundingClientRect();
     var vh = window.innerHeight;
-    var visTop = Math.max(r.top, 0), visBottom = Math.min(r.bottom, vh);
+    // Rows that have scrolled off the top stay revealed; only the curtain or the viewport bottom hides them.
+    var visTop = r.top, visBottom = Math.min(r.bottom, vh);
     var fTop = footer.getBoundingClientRect().top;
     // Read every row's layout position first (offsetTop ignores the transform set below), then write.
     targets.map(function (el) {
