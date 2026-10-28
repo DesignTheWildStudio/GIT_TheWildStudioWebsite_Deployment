@@ -17,7 +17,7 @@
   <script src="./theme.js"></script>
   <link rel="stylesheet" href="./responsive.css">
   <script src="./mobile-nav.js"></script>
-  <script src="./footer-reveal.js"></script>
+  <script src="./footer-reveal.js?v=2"></script>
   <script src="./projects-data.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
@@ -674,9 +674,13 @@ class Component extends DCLogic {
     const bar = pin && pin.querySelector('.ws-tbar');
     if (!pin || !track) return;
     const mobile = this.tMobile();
-    const need = 100 + (this.quotes.length - 1) * 55;
+    const pad = window.innerWidth <= 640 ? 36 : window.innerWidth <= 900 ? 48 : 40;
+    const travel = Math.max(0, track.scrollWidth - (window.innerWidth - pad));
+    // Desktop pin: the panel holds for a short scrub only — the rail covers 2.4px per 1px of page
+    // scroll, so the footer stays a few wheel notches away in both directions.
+    const need = 'calc(100vh + ' + Math.round(travel / 2.4) + 'px)';
     if (mobile) { if (pin.style.height) pin.style.height = ''; }
-    else if (pin.style.height !== need + 'vh') pin.style.height = need + 'vh';
+    else if (this._tPinH !== need || !pin.style.height) { pin.style.height = need; this._tPinH = need; }
     let p;
     if (mobile) {
       p = (this.state.tIdx || 0) / Math.max(1, this.quotes.length - 1);
@@ -696,15 +700,33 @@ class Component extends DCLogic {
     let fs = 15;
     track.style.setProperty('--ws-tfs', fs + 'px');
     while (fs > 10 && over() > 0) { fs -= 0.5; track.style.setProperty('--ws-tfs', fs + 'px'); }
-    const pad = window.innerWidth <= 640 ? 36 : window.innerWidth <= 900 ? 48 : 40;
-    const travel = Math.max(0, track.scrollWidth - (window.innerWidth - pad));
-    track.style.transform = 'translate3d(' + (-p * travel).toFixed(1) + 'px,0,0)';
+    if (mobile || this._tDirect) {
+      cancelAnimationFrame(this._tRaf); this._tRaf = 0; this._tX = -p * travel;
+      track.style.transform = 'translate3d(' + this._tX.toFixed(1) + 'px,0,0)';
+    } else this.tGlide(track, -p * travel);
     if (bar) bar.style.width = (p * 100).toFixed(1) + '%';
     const cueX = pin.querySelector('.ws-scrollcue-x');
     if (cueX) cueX.style.opacity = p > 0.04 ? '0' : '1';
     const n = this.quotes.length;
     const cur = Math.min(n - 1, Math.round(p * (n - 1)));
     if (!mobile && cur !== (this.state.tOff || 0)) this.setState({ tOff: cur });
+  }
+
+  // Desktop: ease the rail toward its scroll position so each wheel notch glides instead of jumping.
+  tGlide(track, x) {
+    this._tTo = x;
+    if (this._tX == null) this._tX = x;
+    if (this._tRaf) return;
+    let last = performance.now();
+    const step = (now) => {
+      const k = 1 - Math.pow(0.8, Math.min(64, Math.max(4, now - last)) / 16.7);
+      last = now;
+      this._tX += (this._tTo - this._tX) * k;
+      if (Math.abs(this._tTo - this._tX) < 0.5) this._tX = this._tTo;
+      track.style.transform = 'translate3d(' + this._tX.toFixed(1) + 'px,0,0)';
+      this._tRaf = this._tX === this._tTo ? 0 : requestAnimationFrame(step);
+    };
+    this._tRaf = requestAnimationFrame(step);
   }
 
   componentDidMount() {
@@ -764,6 +786,7 @@ class Component extends DCLogic {
         const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; sy0 = window.scrollY; horiz = null;
       };
       this._tTouchEnd = (e) => {
+        this._tDirect = false;
         if (!this.tMobile() || !horiz) return;
         const t = e.changedTouches[0], dx = t.clientX - x0;
         if (Math.abs(dx) > 40) this.tScroll(dx < 0 ? 1 : -1);
@@ -781,6 +804,7 @@ class Component extends DCLogic {
         const pad = window.innerWidth <= 640 ? 36 : window.innerWidth <= 900 ? 48 : 40;
         const travel = Math.max(1, track.scrollWidth - (window.innerWidth - pad));
         // 'instant' — a drag must track the finger, and smooth scrolls restart each other every move.
+        this._tDirect = true;
         window.scrollTo({ top: sy0 - dx * (span / travel), behavior: 'instant' });
       };
       rail.addEventListener('touchstart', this._tTouchStart, { passive: true });

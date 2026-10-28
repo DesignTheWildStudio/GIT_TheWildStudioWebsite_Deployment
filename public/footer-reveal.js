@@ -1,4 +1,6 @@
-// Scroll-scrubbed staggered reveal for the curtain footer (GSAP-style, dependency-free)
+// Scroll-scrubbed reveal for the curtain footer (GSAP-style, dependency-free).
+// Each footer row fades and slides in as it is uncovered — by the rising curtain on desktop, where the
+// footer is fixed behind it, or by the viewport edge on phones, where the footer scrolls normally.
 (function () {
   var ease = function (x) { return 1 - Math.pow(1 - x, 3); };
   function update() {
@@ -12,14 +14,19 @@
     });
     var r = wrap.getBoundingClientRect();
     var vh = window.innerHeight;
-    var p = (vh - r.top) / Math.min(r.height, vh);
-    p = Math.max(0, Math.min(1, p));
-    targets.forEach(function (el, i) {
-      var local = Math.max(0, Math.min(1, p * 1.6 - i * 0.22));
-      var e = ease(local);
-      el.style.transform = 'translateY(' + Math.round(50 * (1 - e)) + 'px)';
-      el.style.opacity = String(e);
-      el.style.willChange = 'transform, opacity';
+    var visTop = Math.max(r.top, 0), visBottom = Math.min(r.bottom, vh);
+    var fTop = footer.getBoundingClientRect().top;
+    // Read every row's layout position first (offsetTop ignores the transform set below), then write.
+    targets.map(function (el) {
+      var top = fTop + el.offsetTop, h = Math.max(1, el.offsetHeight);
+      var shown = Math.min(top + h, visBottom) - Math.max(top, visTop);
+      return [el, ease(Math.max(0, Math.min(1, shown / (Math.min(h, 160) * 0.8))))];
+    }).forEach(function (row) {
+      var el = row[0], e = row[1];
+      var tr = 'translateY(' + Math.round(50 * (1 - e)) + 'px)', op = String(Math.round(e * 1000) / 1000);
+      if (el.style.transform !== tr) el.style.transform = tr;
+      if (el.style.opacity !== op) el.style.opacity = op;
+      if (!el.style.willChange) el.style.willChange = 'transform, opacity';
     });
   }
   var ticking = false;
@@ -28,7 +35,8 @@
     ticking = true;
     requestAnimationFrame(function () { ticking = false; update(); });
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
+  // Capture: on phones <body> is the scroll container, and its scroll events never reach window.
+  window.addEventListener('scroll', onScroll, { passive: true, capture: true });
   window.addEventListener('resize', onScroll, { passive: true });
   var tries = 0;
   var t = setInterval(function () { update(); if (++tries > 20) clearInterval(t); }, 300);
