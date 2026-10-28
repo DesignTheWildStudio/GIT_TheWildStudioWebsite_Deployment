@@ -22,10 +22,28 @@ plain HTML under `public/`.
 Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
 `public/` was checked byte-for-byte against the live build with Webtold's
 `verify_page` (sha256). Since then each change has been verified the same way;
-the latest is deploy `331ae793` (20 Oct 2026, Natasha and Jashn case studies,
-updated Goodhood), after `f7d51939` (home showreel in AV1, Safari autoplay),
+the latest is deploy `aaabc019` (28 Oct 2026, phone scrolling and footer, shorter
+pinned testimonials), after `331ae793` (20 Oct 2026, Natasha and Jashn case
+studies, updated Goodhood), `f7d51939` (home showreel in AV1, Safari autoplay),
 `c2f931e6` (Work banner sound like the home showreel) and `149fe5e8` (new home
 showreels).
+
+## Phone scrolling (28 Oct 2026)
+
+On screens up to 900px wide the page itself scrolls, not `<body>`.
+`support.js` sets `html,body{height:100%}`, so `overflow-x: hidden` on body turned
+it into its own scroll box: window scroll events never fired (the footer stayed
+blank) and swipes that started on the fixed header did nothing.
+`public/responsive.css` now uses `overflow-x: clip` on body (with `hidden` as
+the fallback for browsers without clip, which keep the old behaviour). Keep that
+in mind before adding overflow rules to `html` or `body`.
+
+- `public/footer-reveal.js` — desktop keeps the original top-down fade; on
+  phones each footer row fades in as it comes on screen.
+- `public/scroll-restore.js` — phones only: returns the visitor to their place
+  after a reload or Back once the page has rendered.
+- Cache-busters: `responsive.css?v=2` and `footer-reveal.js?v=2` on all six
+  pages. Bump them (and add one to `scroll-restore.js`) on the next change.
 
 ## What is NOT in this repo
 
