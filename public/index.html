@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="./responsive.css?v=2">
   <script src="./mobile-nav.js"></script>
   <script src="./footer-reveal.js?v=2"></script>
+  <script src="./scroll-restore.js"></script>
   <script src="./projects-data.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
@@ -663,7 +664,8 @@ class Component extends DCLogic {
       const k = Math.min(1, (now - t0) / 520);
       const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
       window.scrollTo({ top: from + (to - from) * e, behavior: 'instant' });
-      this._tTween = k < 1 ? requestAnimationFrame(tick) : 0;
+      // Clear a frame later, so the scroll event from the last step still drives the rail directly.
+      this._tTween = requestAnimationFrame(k < 1 ? tick : () => { this._tTween = 0; });
     };
     this._tTween = requestAnimationFrame(tick);
   }
@@ -687,12 +689,18 @@ class Component extends DCLogic {
     // a few wheel notches or swipes away in both directions.
     const vhPx = (pin.firstElementChild && pin.firstElementChild.offsetHeight) || window.innerHeight;
     const need = 'calc(100vh + ' + Math.round(Math.min(travel / 2.4, 2 * vhPx)) + 'px)';
-    if (mobile) { if (pin.style.height) pin.style.height = ''; }
+    if (mobile) { if (pin.style.height) pin.style.height = ''; this._tPinH = 'mobile'; }
     else if (this._tPinH !== need || !pin.style.height) {
-      // A resize that changes the pin while it sits above the viewport must not shift what is on screen.
-      const r0 = this._tPinH && pin.style.height ? pin.getBoundingClientRect() : null;
+      // The pin height follows the window width, so a resize must not move what is on screen: keep the
+      // scrub progress inside the pin and the content below it in place (not on the first sizing).
+      const r0 = this._tPinH ? pin.getBoundingClientRect() : null, y0 = window.scrollY;
+      const s0 = r0 ? r0.height - vhPx : 0, fromMobile = this._tPinH === 'mobile';
       pin.style.height = need; this._tPinH = need;
-      if (r0 && r0.bottom <= 0) window.scrollBy({ top: pin.offsetHeight - r0.height, behavior: 'instant' });
+      if (r0 && r0.top < 0) {
+        const dy = fromMobile ? (r0.bottom <= 0 ? pin.offsetHeight - r0.height : 0)
+          : (this.tSpan(pin) - s0) * Math.min(1, -r0.top / Math.max(1, s0));
+        if (Math.abs(dy) >= 1) window.scrollTo({ top: y0 + dy, behavior: 'instant' });
+      }
     }
     let p;
     if (mobile) {
@@ -727,7 +735,7 @@ class Component extends DCLogic {
 
   // Desktop: ease the rail toward its scroll position so each wheel notch glides instead of jumping.
   tGlide(track, x) {
-    this._tTo = x;
+    this._tTo = x; this._tTrack = track;
     if (this._tX == null) this._tX = x;
     if (this._tRaf) return;
     let last = performance.now();
@@ -736,7 +744,7 @@ class Component extends DCLogic {
       last = now;
       this._tX += (this._tTo - this._tX) * k;
       if (Math.abs(this._tTo - this._tX) < 0.5) this._tX = this._tTo;
-      track.style.transform = 'translate3d(' + this._tX.toFixed(1) + 'px,0,0)';
+      this._tTrack.style.transform = 'translate3d(' + this._tX.toFixed(1) + 'px,0,0)';
       this._tRaf = this._tX === this._tTo ? 0 : requestAnimationFrame(step);
     };
     this._tRaf = requestAnimationFrame(step);
@@ -752,8 +760,7 @@ class Component extends DCLogic {
         const realA = footerEl && footerEl.querySelector('a');
         if (!ov || !curtain || !realA) return;
         const cTop = curtain.getBoundingClientRect().top;
-        // Layout position: footer-reveal.js may still be sliding this row in.
-        const realTop = footerEl.getBoundingClientRect().top + realA.offsetTop;
+        const realTop = realA.getBoundingClientRect().top;
         const track = document.querySelector('.ws-track');
         const testiSec = track && (track.closest('section') || track);
         const tBottom = testiSec ? testiSec.getBoundingClientRect().bottom : -1;
@@ -826,13 +833,15 @@ class Component extends DCLogic {
       rail.addEventListener('touchmove', this._tTouchMove, { passive: false });
     }
 
-    window.addEventListener('scroll', this._tickerRide, { passive: true });
+    // Phones scroll the page too, but there the overlay is hidden and the carousel steps by index,
+    // so these two only need scroll events on desktop.
+    this._deskScroll = () => { if (!this.tMobile()) { this._tickerRide(); this._testi(); } };
+    window.addEventListener('scroll', this._deskScroll, { passive: true });
     window.addEventListener('resize', this._tickerRide);
     this._tickerRide();
     this._tickerTimer = setInterval(this._tickerRide, 500);
 
     this._testi = () => this.testiTick();
-    window.addEventListener('scroll', this._testi, { passive: true });
     window.addEventListener('resize', this._testi);
     this._testi();
     setTimeout(this._testi, 400);
