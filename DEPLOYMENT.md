@@ -22,11 +22,22 @@ plain HTML under `public/`.
 Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
 `public/` was checked byte-for-byte against the live build with Webtold's
 `verify_page` (sha256). Since then each change has been verified the same way;
-the latest is deploy `aaabc019` (28 Oct 2026, phone scrolling and footer, shorter
-pinned testimonials), after `331ae793` (20 Oct 2026, Natasha and Jashn case
+the latest is deploy `2ee88e6b` (29 Oct 2026, Commons page events readable on phones,
+home-style buttons), after `aaabc019` (28 Oct 2026, phone scrolling and footer, shorter
+pinned testimonials), `331ae793` (20 Oct 2026, Natasha and Jashn case
 studies, updated Goodhood), `f7d51939` (home showreel in AV1, Safari autoplay),
 `c2f931e6` (Work banner sound like the home showreel) and `149fe5e8` (new home
 showreels).
+
+## Commons page events (29 Oct 2026)
+
+`project.html?id=commons-karachi` shows the events from the Figma bundle
+`fig-commons/components.bundle.js` (a 1440px canvas scaled to the window). At
+900px and below that canvas is hidden and `project.html` renders the same events
+as a stacked list (`commonsEvents` in `renderVals`: banner, title, date, text,
+link). Change an event's text or image in both places. The desktop 'View full
+project' buttons (`commonsBtns`) sit outside the scaled canvas, positioned as
+percentages of it, so they keep the home page's button size.
 
 ## Phone scrolling (28 Oct 2026)
 
