@@ -55,7 +55,8 @@
     /* The Commons events: desktop shows the 1440px Figma canvas scaled to the window; phones and tablets get the
        same events as a stacked list, each banner edge to edge with the text and button below it. */
     .ws-commons-list { display: none; }
-    .ws-commons-fig div[style*="border-radius: 50px"] { visibility: hidden; } /* Figma's own pills, under the real buttons */
+    /* Figma's own pills (radius 50 in the canvas), under the real buttons */
+    .ws-commons-fig div[style*="border-radius: 50px"], .ws-commons-fig div[style*="border-top-left-radius: 50px"] { visibility: hidden; }
     html.ws-dark .ws-commons-fig .ws-btn { border-color: #141412; color: #141412; } /* the canvas stays white in dark mode */
     @media (max-width: 900px) {
       .ws-commons-fig { display: none !important; }
@@ -291,19 +292,20 @@
       <div ref="{{ figWrapRef }}" class="ws-commons-fig" style="overflow: hidden; margin: 0 -40px; position: relative;">
         <div ref="{{ figScaleRef }}" style="width: 1440px; position: relative;">
           <x-import component-from-global-scope="COMMONSMainPage" from="/fig-commons/components.bundle.js" hint-size="1440px,6116px"></x-import>
-          <sc-for list="{{ commonsBtns }}" as="cb" hint-placeholder-count="6">
-            <a href="{{ cb.href }}" class="ws-btn" style="position: absolute; left: {{ cb.left }}px; top: {{ cb.y }}px; width: auto; height: 49px; padding: 0 28px; font-size: 14px; z-index: 10;">{{ cb.label }}</a>
-          </sc-for>
         </div>
+        <!-- Outside the scaled canvas, so the buttons keep the home page's size at every window width. -->
+        <sc-for list="{{ commonsBtns }}" as="cb" hint-placeholder-count="6">
+          <a href="{{ cb.href }}" class="ws-btn" style="position: absolute; left: {{ cb.lp }}%; top: {{ cb.tp }}%; transform: translateY(-50%); width: auto; height: 49px; padding: 0 28px; font-size: 14px; z-index: 10;">{{ cb.label }}</a>
+        </sc-for>
       </div>
       <div class="ws-commons-list">
         <sc-for list="{{ commonsEvents }}" as="ce" hint-placeholder-count="8">
           <article>
-            <a href="{{ ce.href }}" class="ws-ce-img" aria-label="{{ ce.name }}"><img src="{{ ce.img }}" alt="{{ ce.name }}" width="{{ ce.w }}" height="{{ ce.h }}" loading="lazy" decoding="async"></a>
-            <h3 style="margin: 0 0 8px; font-family: 'Archivo', 'Helvetica Neue', sans-serif; font-size: 24px; line-height: 1.15; letter-spacing: 0; text-transform: uppercase; font-weight: 400; color: #141412;">{{ ce.name }}</h3>
-            <div style="font-size: 16px; line-height: 1.6; color: rgba(20,20,18,.45);">{{ ce.date }}</div>
+            <a href="{{ ce.href }}" class="ws-ce-img" tabIndex="-1" aria-hidden="true"><img src="{{ ce.img }}" alt="" width="{{ ce.w }}" height="{{ ce.h }}" loading="lazy" decoding="async"></a>
+            <h2 style="margin: 0 0 8px; font-family: 'Archivo', 'Helvetica Neue', sans-serif; font-size: 24px; line-height: 1.15; letter-spacing: 0; text-transform: uppercase; font-weight: 400; color: #141412;">{{ ce.name }}</h2>
+            <div style="font-size: 16px; line-height: 1.6;">{{ ce.date }}</div>
             <p style="margin: 14px 0 0; font-size: 16px; line-height: 1.7; color: rgba(20,20,18,.66);">{{ ce.text }}</p>
-            <a class="ws-btn" href="{{ ce.href }}" style="width: auto; height: 49px; padding: 0 28px; font-size: 14px; margin-top: 24px;">View full project</a>
+            <a class="ws-btn" href="{{ ce.href }}" aria-label="View full project: {{ ce.name }}" style="width: auto; height: 49px; padding: 0 28px; font-size: 14px; margin-top: 24px;">View full project</a>
           </article>
         </sc-for>
       </div>
@@ -669,15 +671,21 @@ class Component extends DCLogic {
     this._lzMo = new MutationObserver(() => this._lzSweep());
     this._lzMo.observe(document.body, { childList: true, subtree: true });
     this._lzSweep();
+    // Scale the Figma canvas to the window. Skipped while it is hidden (the Commons canvas on phones), and also
+    // run on resize so a rotated tablet never shows it unscaled.
+    this._figFit = () => {
+      const wrap = this.refs.figWrapRef, sc = this.refs.figScaleRef;
+      if (!wrap || !sc || !this._figH || !wrap.clientWidth) return;
+      const s = wrap.clientWidth / 1440;
+      if (this._figS !== s) { this._figS = s; sc.style.zoom = s; }
+    };
+    window.addEventListener('resize', this._figFit);
     this._figSync = setInterval(() => {
       document.querySelectorAll('video').forEach(v => {
         v.muted = true; v.volume = 0;
         if (v.paused) { v.play().catch(() => {}); }
       });
-      const wrap = this.refs.figWrapRef, sc = this.refs.figScaleRef;
-      if (!wrap || !sc || !this._figH) return;
-      const s = wrap.clientWidth / 1440;
-      if (this._figS !== s) { this._figS = s; sc.style.zoom = s; }
+      this._figFit();
     }, 400);
 
     this._io = new IntersectionObserver((entries) => {
@@ -700,6 +708,7 @@ class Component extends DCLogic {
     cancelAnimationFrame(this._raf);
     clearInterval(this._sweep);
     clearInterval(this._figSync);
+    window.removeEventListener('resize', this._figFit);
     cancelAnimationFrame(this._posterRaf);
     if (this._io) this._io.disconnect();
   }
@@ -806,7 +815,8 @@ class Component extends DCLogic {
         { left: 851.086, top: 4239.875, w: 209, h: 54, href: 'project.html?id=colour-crush' },
         { left: 92.461, top: 4957.304, w: 209, h: 54, href: 'project.html?id=chaandni-raatein' },
         { left: 877.086, top: 5828.675, w: 209, h: 54, href: 'project.html?id=jashn' },
-      ].map(b => ({ ...b, label: b.label || 'View full project', y: b.top + (b.h - 49) / 2 })),
+      ].map(b => ({ ...b, label: b.label || 'View full project',
+        lp: (b.left / 1440 * 100).toFixed(4), tp: ((b.top + b.h / 2) / 6116 * 100).toFixed(4) })),
       // The same events as a stacked list for phones and tablets (the desktop canvas above is hidden there).
       commonsEvents: [
         { name: 'Eid Milan 2.0', date: 'April 2023', img: '/media/asset-35b8c5187cdbd3aead05edea.webp', w: 782, h: 768, href: 'project.html?id=eid-milan-2', text: 'Our first Eid gathering that brought the community together through music, food, and shared moments of celebration.' },
