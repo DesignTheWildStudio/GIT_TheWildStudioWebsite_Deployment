@@ -52,6 +52,18 @@
     html.ws-dark .ws-btn { border-color: #ECEAE3; color: #ECEAE3; }
     html.ws-dark .ws-btn::before { background: #FFC72C; }
     html.ws-dark .ws-btn:hover { color: #141412; }
+    /* The Commons events: desktop shows the 1440px Figma canvas scaled to the window; phones and tablets get the
+       same events as a stacked list, each banner edge to edge with the text and button below it. */
+    .ws-commons-list { display: none; }
+    .ws-commons-fig div[style*="border-radius: 50px"] { visibility: hidden; } /* Figma's own pills, under the real buttons */
+    html.ws-dark .ws-commons-fig .ws-btn { border-color: #141412; color: #141412; } /* the canvas stays white in dark mode */
+    @media (max-width: 900px) {
+      .ws-commons-fig { display: none !important; }
+      .ws-commons-list { display: flex; flex-direction: column; gap: 64px; }
+      .ws-ce-img { display: block; margin: 0 -24px 24px; }
+      .ws-ce-img img { display: block; width: 100%; height: auto; }
+    }
+    @media (max-width: 640px) { .ws-ce-img { margin: 0 -18px 22px; } }
     body { margin: 0; background: #FFFFFF; color: #141412; font-family: 'Century Gothic', 'CenturyGothic', 'Questrial', 'Helvetica Neue', sans-serif; -webkit-font-smoothing: antialiased; }
     h1, h2, h3 { font-family: 'Archivo', 'Helvetica Neue', sans-serif; }
     * { box-sizing: border-box; }
@@ -276,13 +288,24 @@
       </div>
     </sc-if>
     <sc-if value="{{ isCommons }}" hint-placeholder-val="{{ false }}">
-      <div ref="{{ figWrapRef }}" style="overflow: hidden; margin: 0 -40px; position: relative;">
+      <div ref="{{ figWrapRef }}" class="ws-commons-fig" style="overflow: hidden; margin: 0 -40px; position: relative;">
         <div ref="{{ figScaleRef }}" style="width: 1440px; position: relative;">
           <x-import component-from-global-scope="COMMONSMainPage" from="/fig-commons/components.bundle.js" hint-size="1440px,6116px"></x-import>
           <sc-for list="{{ commonsBtns }}" as="cb" hint-placeholder-count="6">
-            <a href="{{ cb.href }}" class="ws-btn" style="position: absolute; left: {{ cb.left }}px; top: {{ cb.top }}px; width: {{ cb.w }}px; height: {{ cb.h }}px; font-size: 18px; font-family: 'Century Gothic', 'Questrial', sans-serif; font-weight: 400; text-transform: none; letter-spacing: 0; background: #FFFFFF; z-index: 10;">{{ cb.label }}</a>
+            <a href="{{ cb.href }}" class="ws-btn" style="position: absolute; left: {{ cb.left }}px; top: {{ cb.y }}px; width: auto; height: 49px; padding: 0 28px; font-size: 14px; z-index: 10;">{{ cb.label }}</a>
           </sc-for>
         </div>
+      </div>
+      <div class="ws-commons-list">
+        <sc-for list="{{ commonsEvents }}" as="ce" hint-placeholder-count="8">
+          <article>
+            <a href="{{ ce.href }}" class="ws-ce-img" aria-label="{{ ce.name }}"><img src="{{ ce.img }}" alt="{{ ce.name }}" width="{{ ce.w }}" height="{{ ce.h }}" loading="lazy" decoding="async"></a>
+            <h3 style="margin: 0 0 8px; font-family: 'Archivo', 'Helvetica Neue', sans-serif; font-size: 24px; line-height: 1.15; letter-spacing: 0; text-transform: uppercase; font-weight: 400; color: #141412;">{{ ce.name }}</h3>
+            <div style="font-size: 16px; line-height: 1.6; color: rgba(20,20,18,.45);">{{ ce.date }}</div>
+            <p style="margin: 14px 0 0; font-size: 16px; line-height: 1.7; color: rgba(20,20,18,.66);">{{ ce.text }}</p>
+            <a class="ws-btn" href="{{ ce.href }}" style="width: auto; height: 49px; padding: 0 28px; font-size: 14px; margin-top: 24px;">View full project</a>
+          </article>
+        </sc-for>
       </div>
     </sc-if>
     <sc-if value="{{ isRosa }}" hint-placeholder-val="{{ false }}">
@@ -783,7 +806,18 @@ class Component extends DCLogic {
         { left: 851.086, top: 4239.875, w: 209, h: 54, href: 'project.html?id=colour-crush' },
         { left: 92.461, top: 4957.304, w: 209, h: 54, href: 'project.html?id=chaandni-raatein' },
         { left: 877.086, top: 5828.675, w: 209, h: 54, href: 'project.html?id=jashn' },
-      ].map(b => ({ ...b, label: b.label || 'View full project' })),
+      ].map(b => ({ ...b, label: b.label || 'View full project', y: b.top + (b.h - 49) / 2 })),
+      // The same events as a stacked list for phones and tablets (the desktop canvas above is hidden there).
+      commonsEvents: [
+        { name: 'Eid Milan 2.0', date: 'April 2023', img: '/media/asset-35b8c5187cdbd3aead05edea.webp', w: 782, h: 768, href: 'project.html?id=eid-milan-2', text: 'Our first Eid gathering that brought the community together through music, food, and shared moments of celebration.' },
+        { name: 'Best Day Ever', date: 'December 2023', img: '/media/best-day-ever-70e2d16d.webp', w: 1078, h: 1076, href: 'project.html?id=best-day-ever', text: 'A winter event that brings together local small businesses, home-grown startup brands, artists, and food vendors for a festive weekend community networking.' },
+        { name: 'Eid Milan', date: 'March 2024', img: '/media/asset-ca9ad5b13b9d9013e191ac06.webp', w: 1400, h: 1400, href: 'project.html?id=eid-milan', text: 'A warm community celebration bringing people together to share the joy of Eid through music, food, and culture.' },
+        { name: 'Picnic Together', date: 'December 2024', img: '/media/asset-f260e0a7e58280bb75a457f9.webp', w: 1600, h: 1565, href: 'project.html?id=picnic', text: 'A laid-back summer gathering that brought people outdoors for picnics, workshops, games, music, and community bonding.' },
+        { name: 'Dil Se', date: 'February 2025', img: '/media/asset-3b5b02d7812a60d7e96f06c5.webp', w: 782, h: 768, href: 'project.html?id=dil-se', text: "A heartfelt celebration of love, creativity, and togetherness, inspired by the spirit of Valentine's season and shared experiences." },
+        { name: 'Colour Crush', date: 'December 2025', img: '/media/colour-crush-commons-tile-hq.webp', w: 944, h: 928, href: 'project.html?id=colour-crush', text: 'A vibrant spring festival filled with colour, creativity, local brands, workshops, and joyful community moments.' },
+        { name: 'Chaandni Raatein', date: 'March 2026', img: '/media/asset-37946cac097c4dff02b98022.webp', w: 720, h: 708, href: 'project.html?id=chaandni-raatein', text: 'A vibrant Ramadan experience bringing together local brands, delicious food, live entertainment, and community spirit.' },
+        { name: 'Jashn', date: 'September 2026', img: '/media/asset-6c212fe9c6eaa65950a28937.webp', w: 782, h: 768, href: 'project.html?id=jashn', text: 'A lively South Asian market celebrating culture, craftsmanship, food, music, and independent local businesses under one roof.' },
+      ],
       name: p.name, services: p.services, year: p.year, blurb: p.blurb,
       hasStory: !!(p.timeline && p.timeline.length),
       ovParas: (p.intro && p.intro.length) ? p.intro : [p.blurb],
