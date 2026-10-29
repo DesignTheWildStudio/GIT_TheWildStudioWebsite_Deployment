@@ -22,8 +22,9 @@ plain HTML under `public/`.
 Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
 `public/` was checked byte-for-byte against the live build with Webtold's
 `verify_page` (sha256). Since then each change has been verified the same way;
-the latest is deploy `2ee88e6b` (29 Oct 2026, Commons page events readable on phones,
-home-style buttons), after `aaabc019` (28 Oct 2026, phone scrolling and footer, shorter
+the latest is deploy `0ef09c68` (29 Oct 2026, phone menu button always shows), after
+`2ee88e6b` (29 Oct 2026, Commons page events readable on phones, home-style buttons),
+`aaabc019` (28 Oct 2026, phone scrolling and footer, shorter
 pinned testimonials), `331ae793` (20 Oct 2026, Natasha and Jashn case
 studies, updated Goodhood), `f7d51939` (home showreel in AV1, Safari autoplay),
 `c2f931e6` (Work banner sound like the home showreel) and `149fe5e8` (new home
@@ -53,8 +54,12 @@ in mind before adding overflow rules to `html` or `body`.
   phones each footer row fades in as it comes on screen.
 - `public/scroll-restore.js` — phones only: returns the visitor to their place
   after a reload or Back once the page has rendered.
-- Cache-busters: `responsive.css?v=2` and `footer-reveal.js?v=2` on all six
-  pages. Bump them (and add one to `scroll-restore.js`) on the next change.
+- Cache-busters: `responsive.css?v=2`, `footer-reveal.js?v=2` and
+  `mobile-nav.js?v=2` on all six pages. Bump them (and add one to
+  `scroll-restore.js`) on the next change.
+- `public/mobile-nav.js` adds the phone menu and theme buttons to the rendered
+  header only (never the raw `<x-dc>` template, which the runtime copies without
+  their listeners) and puts them back whenever a re-render drops them.
 
 ## What is NOT in this repo
 
