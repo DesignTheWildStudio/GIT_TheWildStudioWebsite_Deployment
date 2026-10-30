@@ -592,6 +592,10 @@
       this._img.addEventListener('load', () => {
         this._loadPending = false;
         this._releaseMask(true);
+        // The Wild Studio: limit a saved crop to this frame's shape before showing it. A crop made for a
+        // square desktop frame otherwise leaves an empty strip in the wider phone frame when the photo
+        // arrives after the last render. (Re-apply if this starter file is ever copied again.)
+        this._clampView();
         this._applyView();
       });
       this._img.addEventListener('error', () => {

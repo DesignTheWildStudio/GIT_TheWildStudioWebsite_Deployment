@@ -152,7 +152,9 @@
   /* minmax(0, …): a plain 1fr column grows to its widest content (the pictures' own pixel width), pushing the
      pictures and text past the screen edge. */
   section[data-screen-label="Service categories"] > div { grid-template-columns: minmax(0, 1fr) !important; }
-  section[data-screen-label="Service categories"] > div > a { grid-column: 1 !important; aspect-ratio: 4 / 3 !important; }
+  section[data-screen-label="Service categories"] > div > a { grid-column: 1 !important; aspect-ratio: 4 / 3 !important; min-width: 0 !important; }
+  /* The picture fills its 4:3 card exactly; in flow, its built-in 3:2 shape pushed the column past the screen. */
+  section[data-screen-label="Service categories"] > div > a > image-slot { position: absolute !important; inset: 0 !important; }
   section[data-screen-label="Service categories"] > div > div { grid-column: 1 !important; aspect-ratio: auto !important; padding: 40px 24px 56px !important; }
   section[data-screen-label="Service categories"] > div > div div[style*="grid-template-columns: repeat"] { grid-template-columns: 1fr 1fr !important; max-width: none !important; }
   section[data-screen-label="Service categories"] > div > a:nth-of-type(1) { order: 1 !important; } section[data-screen-label="Service categories"] > div > div:nth-of-type(1) { order: 2 !important; }
