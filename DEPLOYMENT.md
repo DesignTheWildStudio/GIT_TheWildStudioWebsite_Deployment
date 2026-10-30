@@ -22,8 +22,8 @@ plain HTML under `public/`.
 Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
 `public/` was checked byte-for-byte against the live build with Webtold's
 `verify_page` (sha256). Since then each change has been verified the same way;
-the latest is deploy `fa58f698` (30 Oct 2026, Services page pictures edge to edge on
-phones), after `0ef09c68` (29 Oct 2026, phone menu button always shows),
+the latest is deploy `da290fea` (30 Oct 2026, CORE logo in the home page ticker), after
+`fa58f698` (30 Oct 2026, Services page pictures edge to edge on phones), `0ef09c68` (29 Oct 2026, phone menu button always shows),
 `2ee88e6b` (29 Oct 2026, Commons page events readable on phones, home-style buttons),
 `aaabc019` (28 Oct 2026, phone scrolling and footer, shorter
 pinned testimonials), `331ae793` (20 Oct 2026, Natasha and Jashn case
