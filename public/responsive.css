@@ -149,7 +149,9 @@
   section[data-screen-label="All clients"] .ws-dd-menu { left: 0 !important; right: auto !important; }
 
   /* Services page */
-  section[data-screen-label="Service categories"] > div { grid-template-columns: 1fr !important; }
+  /* minmax(0, …): a plain 1fr column grows to its widest content (the pictures' own pixel width), pushing the
+     pictures and text past the screen edge. */
+  section[data-screen-label="Service categories"] > div { grid-template-columns: minmax(0, 1fr) !important; }
   section[data-screen-label="Service categories"] > div > a { grid-column: 1 !important; aspect-ratio: 4 / 3 !important; }
   section[data-screen-label="Service categories"] > div > div { grid-column: 1 !important; aspect-ratio: auto !important; padding: 40px 24px 56px !important; }
   section[data-screen-label="Service categories"] > div > div div[style*="grid-template-columns: repeat"] { grid-template-columns: 1fr 1fr !important; max-width: none !important; }

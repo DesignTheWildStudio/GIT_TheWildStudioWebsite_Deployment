@@ -54,7 +54,7 @@ in mind before adding overflow rules to `html` or `body`.
   phones each footer row fades in as it comes on screen.
 - `public/scroll-restore.js` — phones only: returns the visitor to their place
   after a reload or Back once the page has rendered.
-- Cache-busters: `responsive.css?v=2`, `footer-reveal.js?v=2` and
+- Cache-busters: `responsive.css?v=3`, `footer-reveal.js?v=2` and
   `mobile-nav.js?v=2` on all six pages. Bump them (and add one to
   `scroll-restore.js`) on the next change.
 - `public/mobile-nav.js` adds the phone menu and theme buttons to the rendered
