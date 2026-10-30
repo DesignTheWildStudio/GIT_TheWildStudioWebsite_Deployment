@@ -116,6 +116,8 @@
     html.ws-dark .ws-mq-white, html.ws-dark .ws-mq-white:hover { filter: grayscale(1) brightness(0) invert(1) !important; }
     html.ws-dark .ws-mq-whover:hover { filter: grayscale(1) brightness(0) invert(1) !important; }
     html.ws-dark img.ws-mq-dark[src$="chyll-white-trim.png"], html.ws-dark img.ws-mq-dark[src$="chyll-white-trim.png"]:hover { filter: none !important; }
+    html.ws-dark img.ws-mq-dark[src*="core-logo-dark-"] { filter: grayscale(1) brightness(0) invert(1) !important; }
+    html.ws-dark img.ws-mq-dark[src*="core-logo-dark-"]:hover { filter: none !important; }
     html.ws-dark .ws-mq-light.ws-swap { display: none !important; }
     .ws-bento-row { display: flex; gap: 14px; }
     .ws-bento-card { position: relative; overflow: hidden; flex: 1 1 0; border-radius: 18px; transition: flex-grow .8s cubic-bezier(.19,1,.22,1); }
@@ -1193,6 +1195,7 @@ class Component extends DCLogic {
           { name: 'Chyll', logo: 'media/chyll-logo-1eb3e28f.webp', dark: 'media/arsha-and-emaan-logo-c5ecca73.webp', h: 60 },
           { name: 'The Commons Karachi', logo: 'media/sitwat-rizvi-logo-ec55da08.webp', h: 88, white: true },
           { name: 'Super Power', logo: 'media/super-power-logo-ed89da47.webp', pale: true },
+          { name: 'CORE', logo: 'media/core-logo-7efa4fc7.webp', dark: 'media/core-logo-dark-cd200058.webp', h: 46, pale: true },
         ];
         return [...list, ...list].map(m => ({ ...m, h: m.h || 64, mx: m.mx || 56, hDark: m.hDark || m.h || 64, lightCls: (m.dark ? 'ws-swap ' : '') + (m.pale ? 'ws-mq-pale ' : '') + (m.ink ? 'ws-mq-ink ' : '') + (m.whover ? 'ws-mq-whover ' : '') + (m.white ? 'ws-mq-white' : '') }));
       })(),
