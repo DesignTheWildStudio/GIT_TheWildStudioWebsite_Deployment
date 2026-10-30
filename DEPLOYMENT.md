@@ -22,7 +22,8 @@ plain HTML under `public/`.
 Last synced with live deploy `ece76b25` (5 Oct 2026). Every file under
 `public/` was checked byte-for-byte against the live build with Webtold's
 `verify_page` (sha256). Since then each change has been verified the same way;
-the latest is deploy `0ef09c68` (29 Oct 2026, phone menu button always shows), after
+the latest is deploy `fa58f698` (30 Oct 2026, Services page pictures edge to edge on
+phones), after `0ef09c68` (29 Oct 2026, phone menu button always shows),
 `2ee88e6b` (29 Oct 2026, Commons page events readable on phones, home-style buttons),
 `aaabc019` (28 Oct 2026, phone scrolling and footer, shorter
 pinned testimonials), `331ae793` (20 Oct 2026, Natasha and Jashn case
@@ -57,6 +58,10 @@ in mind before adding overflow rules to `html` or `body`.
 - Cache-busters: `responsive.css?v=3`, `footer-reveal.js?v=2` and
   `mobile-nav.js?v=2` on all six pages. Bump them (and add one to
   `scroll-restore.js`) on the next change.
+- `public/image-slot.js` is a copied starter component with one local patch: the
+  img `load` handler calls `_clampView()` before `_applyView()`, so a saved desktop
+  crop never leaves an empty strip in a phone-shaped frame. Re-apply it if the
+  starter is ever copied again. It is loaded as `image-slot.js?v=2`.
 - `public/mobile-nav.js` adds the phone menu and theme buttons to the rendered
   header only (never the raw `<x-dc>` template, which the runtime copies without
   their listeners) and puts them back whenever a re-render drops them.
